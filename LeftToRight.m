@@ -39,7 +39,7 @@ for row = 1:h
         data3 = fetchColor( [start:col]', ones(halfWindowSize,1).* row, depthMap(row, start:col)',image1_struct, image2_struct );
         cost_2 = computeZNCC(data1, data3);
         if(cost_2 < cost_1)
-            depthMap(row,col) = randMap(row, col);
+            depthMap(row,col) = depthMap(row, col - 1);
         end        
     end
 end
