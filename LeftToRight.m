@@ -23,14 +23,16 @@ for row = 1:h
     end
 end    
 % the remainning pixels
-if(matlabpool('size') ==0)
-    matlabpool open;
+if(matlabpool('size') ~=0)
+    matlabpool close;    
 end
+matlabpool open;
 
 localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));
 tic;
 parfor row = 1:h          
+% for row = 1:h          
     emptyMap(row, :) = routine_LeftRight(randMap, image1_struct, image2_struct, depthMap, row, localWindowSize);    
     fprintf('row %d is finished', row);
 end

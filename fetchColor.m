@@ -13,11 +13,17 @@ proj = proj./ repmat(proj(3,:), 3,1);
 
 [h,w,~] = size(image2);
 if( all(proj(1,:) > 0) && all(proj(1,:) < w) && all(proj(2,:) > 0) && all(proj(2,:) < h)) % image projection is within the 2nd image
-    [xGrid,yGrid] = meshgrid(1:w, 1:h);
-    color = zeros(1,3 * size(proj,2));
-    color(1:3:end) = interp2(xGrid, yGrid, image2(:,:,1), proj(1,:) + 1, proj(2,:) + 1, 'linear');
-    color(2:3:end) = interp2(xGrid, yGrid, image2(:,:,2), proj(1,:) + 1, proj(2,:) + 1, 'linear');
-    color(3:3:end) = interp2(xGrid, yGrid, image2(:,:,3), proj(1,:) + 1, proj(2,:) + 1, 'linear');
+%     [xGrid,yGrid] = meshgrid(1:w, 1:h);
+    numOfPoints = size(proj,2);
+    color = zeros(1,3 * numOfPoints);
+%     color(1:3:end) = interp2(xGrid, yGrid, image2(:,:,1), proj(1,:) + 1, proj(2,:) + 1, 'linear');
+%     color(2:3:end) = interp2(xGrid, yGrid, image2(:,:,2), proj(1,:) + 1, proj(2,:) + 1, 'linear');
+%     color(3:3:end) = interp2(xGrid, yGrid, image2(:,:,3), proj(1,:) + 1, proj(2,:) + 1, 'linear');
+    newColor = vgg_interp2(image2, proj(1,:) + 1, proj(2,:) + 1, 'linear');
+    newColor = newColor(:);
+    color(1:3:end) = newColor(1:numOfPoints);
+    color(2:3:end) = newColor(numOfPoints+1 : numOfPoints * 2);
+    color(3:3:end) = newColor(numOfPoints*2 + 1 : numOfPoints*3);
 else
-   color = zeros(1,3); 
+   color = zeros(1,3 * size(proj,2)); 
 end
