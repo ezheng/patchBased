@@ -7,7 +7,7 @@ function depthMap = proporgation(image1_struct, image2_struct, depthMap, flag)
 % 3    down -> top
 switch (flag)
     case (0)
-        depthMap = LeftToRight(image1_struct, image2_struct, depthMap);
+        depthMap = LeftToRight(image1_struct, image2_struct, depthMap, 1);
     case (1)
         depthMap = RightToLight(image1_struct, image2_struct, depthMap);
     case (2)
