@@ -3,11 +3,12 @@ function cost = computeZNCC(data1, data2)
 if(all(data2 == 0))
     cost = -2;   
 else
-    dataSize = numel(data1);
-    c = zeros(1,3);
-    c(1) = compteZNCC_oneChannel(data1(1:dataSize/3), data2(1:dataSize/3));
-    c(2) = compteZNCC_oneChannel(data1(dataSize/3+1: dataSize/3*2), data2(dataSize/3+1: dataSize/3*2));
-    c(3) = compteZNCC_oneChannel(data1(dataSize/3*2+1: dataSize), data2(dataSize/3*2+1: dataSize));
+    dataSize = numel(data1); 
+    dataSizePerChannel = dataSize/3;
+    c = zeros(1,3);    
+    c(1) = compteZNCC_oneChannel(data1(1:dataSizePerChannel), data2(1:dataSizePerChannel));
+    c(2) = compteZNCC_oneChannel(data1(dataSizePerChannel+1: dataSizePerChannel*2), data2(dataSizePerChannel+1: dataSizePerChannel*2));
+    c(3) = compteZNCC_oneChannel(data1(dataSizePerChannel*2+1: dataSize), data2(dataSizePerChannel*2+1: dataSize));
     cost = mean(c);
 end
 end

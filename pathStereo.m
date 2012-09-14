@@ -16,14 +16,36 @@ img2_struct.imageData = image2; [h, w, d] = size(image2); img2_struct.h = h; img
 
 % ------------
 
-s = RandStream('mcg16807','Seed',0);
-RandStream.setDefaultStream(s);
+% s = RandStream('mcg16807','Seed',0);
+% RandStream.setDefaultStream(s);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
-numOfIteration = 5;
+numOfIteration = 1;
+
+tic;
+if(matlabpool('size') ~=0)
+    matlabpool close;    
+end
+matlabpool open;
+close all;
 for i = 1:numOfIteration
-    depthMap = proporgation(img1_struct, img2_struct, depthMap, 0);
-    depthMap = proporgation(img1_struct, img2_struct, depthMap, 1);
-    depthMap = proporgation(img1_struct, img2_struct, depthMap, 2);
-    depthMap = proporgation(img1_struct, img2_struct, depthMap, 3);
+    depthMap = proporgation(img1_struct, img2_struct, depthMap, 0,1);
+    showImg(depthMap);
+     depthMap = proporgation(img1_struct, img2_struct, depthMap, 1,5);
+     showImg(depthMap);
+     depthMap = proporgation(img1_struct, img2_struct, depthMap, 2,5);
+     showImg(depthMap);
+    depthMap = proporgation(img1_struct, img2_struct, depthMap, 3,5);
+    showImg(depthMap);
+end
+matlabpool close;
+t = toc;
+fprintf('use %f seconds', t);
+
+end
+
+
+function showImg(depthMap)
+    figure();
+    imagesc(depthMap); axis equal;
 end
