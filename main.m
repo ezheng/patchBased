@@ -1,6 +1,6 @@
 function main()
 
-fileName = 'C:/Enliang/matlab/patchBased/fountain/fountain - Copy.txt'; 
+fileName = 'C:\Enliang\MATLAB\patchBased\fountain_yilin\origImage\fountain.txt'; 
 image = read_middleBurry(fileName);
 
 % do stereo

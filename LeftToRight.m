@@ -6,8 +6,13 @@ global far; global near; global halfWindowSize;
 h = image1_struct.h;
 w = image1_struct.w;
 randMap = rand(h, w) * (far - near) + near;
+
+% depthTruth = loadFLTFile('C:\Enliang\MATLAB\patchBased\fountain_yilin\fountain0004_DepthMap.flt');
+% randMap = depthTruth;
+
+ 
 % begin few pixels
-for row = 1:h
+for row = 1:h 
     for col = 2:halfWindowSize-1
 %         propagate        
         depthMap(row, col) = depthMap(row, col-1);
