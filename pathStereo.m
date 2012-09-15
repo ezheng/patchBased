@@ -27,16 +27,16 @@ if(matlabpool('size') ~=0)
     matlabpool close;    
 end
 matlabpool open;
-close all;
+% close all;
 for i = 1:numOfIteration
-    depthMap = proporgation(img1_struct, img2_struct, depthMap, 0,5);
-    showImg(depthMap);
+%     depthMap = proporgation(img1_struct, img2_struct, depthMap, 0,5);
+%     showImg(depthMap);
 %      depthMap = proporgation(img1_struct, img2_struct, depthMap, 1,5);
 %      showImg(depthMap);
 %      depthMap = proporgation(img1_struct, img2_struct, depthMap, 2,5);
 %      showImg(depthMap);
-%     depthMap = proporgation(img1_struct, img2_struct, depthMap, 3,5);
-%     showImg(depthMap);
+    depthMap = proporgation(img1_struct, img2_struct, depthMap, 3,5);
+    showImg(depthMap);
 end
 matlabpool close;
 t = toc;
