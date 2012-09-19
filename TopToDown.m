@@ -11,14 +11,14 @@ randMap = rand(h, w) * (far - near) + near;
 
 localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));
-tic;
+% tic;
 parfor col = 1:w          
-% for row = 1:h          
+% for col = 1:w          
     emptyMap(:, col) = routine_TopDown(randMap, image1_struct, image2_struct, depthMap, col, localWindowSize, colWidth);    
-    fprintf('row %d is finished\n', col);
+%     fprintf('row %d is finished\n', col);
 end
-t = toc;
-fprintf(1, 'elapsed time is %f', t);
+% t = toc;
+% fprintf(1, 'elapsed time is %f', t);
 depthMap = emptyMap;
 
 end
@@ -42,11 +42,17 @@ function oneCol = routine_TopDown(randMap, image1_struct, image2_struct, depthMa
         depthData = depthMap(rowStart:rowEnd, colStart:colEnd); depthData = depthData(:);
         depthData(:) = randMap(row,col);
         data3 = fetchColor( meshX, meshY, depthData,image1_struct, image2_struct );
-        cost_2 = computeZNCC(data1, data3);
-        if(cost_2 < cost_1)        
-            depthMap(row,col) = depthMap(row-1,col);
-        else
-            depthMap(row,col) = randMap(row,col);
+        cost_2 = computeZNCC(data1, data3);        
+%         cost of original depthValue:
+        depthData(:) = depthMap(row, col);
+        data4 = fetchColor( meshX, meshY, depthData, image1_struct, image2_struct);
+        cost_3 = computeZNCC(data1, data4);
+        if(cost_3 < cost_1 || cost_3 < cost_2)            
+            if(cost_2 < cost_1)
+                depthMap(row,col) = depthMap(row-1,col);
+            else
+                depthMap(row,col) = randMap(row,col);
+            end
         end
     end
     oneCol = depthMap(:,col);    

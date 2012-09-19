@@ -16,11 +16,11 @@ img2_struct.imageData = image2; [h, w, d] = size(image2); img2_struct.h = h; img
 
 % ------------
 
-% s = RandStream('mcg16807','Seed',0);
-% RandStream.setDefaultStream(s);
+s = RandStream('mcg16807','Seed',0);
+RandStream.setDefaultStream(s);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
-numOfIteration = 30;
+numOfIteration = 5;
 
 tic;
 if(matlabpool('size') ~=0)
@@ -28,15 +28,28 @@ if(matlabpool('size') ~=0)
 end
 matlabpool open;
 % close all;
-for i = 1:numOfIteration
-    depthMap = proporgation(img1_struct, img2_struct, depthMap, 0,5);
-    showImg(depthMap);
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_new_largeRange';
+saveImg(depthMap, fullfile(depthFileSavePath, ['loop', num2str(1), '_', '0.mat']));
+
+for i = 1:numOfIteration    
+%      depthMap = proporgation(img1_struct, img2_struct, depthMap, 0,5);
+%     saveImg(depthMap, 'Parallel.mat');
+%     saveImg(depthMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']));
+%     
+     A =  rand(h,w) * (far - near) + near; % depthMap initialization;
+     A =  rand(h,w) * (far - near) + near;
+     load loop1_1.mat;
+%      depthMap = proporgation(img1_struct, img2_struct, depthMap, 2,5);
+%      saveImg(depthMap, 'Parallel.mat');
+%      saveImg(depthMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '1.mat']));
+     
      depthMap = proporgation(img1_struct, img2_struct, depthMap, 1,5);
-     showImg(depthMap);
-     depthMap = proporgation(img1_struct, img2_struct, depthMap, 2,5);
-     showImg(depthMap);
+     saveImg(depthMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '2.mat']));
+%      
     depthMap = proporgation(img1_struct, img2_struct, depthMap, 3,5);
-    showImg(depthMap);
+    saveImg(depthMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '3.mat'] ));  
+%     
+    fprintf(1, 'Iteration %i is finished\n', i);
 end
 matlabpool close;
 t = toc;
@@ -47,7 +60,9 @@ save all.mat;
 end
 
 
-function showImg(depthMap)
-    figure();
-    imagesc(depthMap); axis equal;
+function saveImg(depthMap, fileName)
+%     figure();
+%     imagesc(depthMap); axis equal;
+    save(fileName, 'depthMap');
+
 end
