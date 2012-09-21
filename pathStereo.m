@@ -33,7 +33,7 @@ if(matlabpool('size') ~=0)
 end
 matlabpool open;
 
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased\saveDepthFile_ltrb_new_smallRange_idmap';
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_new_smallRange_idmap_allImg';
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);
 end
@@ -41,7 +41,7 @@ end
 
 for i = 1:numOfIteration    
      [depthMap, idMap] = proporgation(img1_struct, otherImage_struct, depthMap, idMap, 0,halfWindowSize);
-     saveImg(depthMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']));
+     saveImg(depthMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']), idMap);
 %     
 %      A =  rand(h,w) * (far - near) + near; % depthMap initialization;
 %      A =  rand(h,w) * (far - near) + near;

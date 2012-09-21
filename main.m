@@ -5,6 +5,6 @@ image = read_middleBurry(fileName);
 
 % do stereo
 
-pathStereo(image(1), image(2:3));
+pathStereo(image(1), image(2:11));
 
 
