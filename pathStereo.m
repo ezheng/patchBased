@@ -1,8 +1,9 @@
 function pathStereo(img1_struct, otherImage_struct)
 
-global near; global far; global halfWindowSize;
+global near; global far; global halfWindowSize; global MATCH_METHOD;
 near = 3.5;
 far = 13.5;
+MATCH_METHOD = 'NCC';
 halfWindowSize = 5; % window size is 7 by 7
 %--------------------------------------------- 
 
