@@ -52,11 +52,14 @@ function [oneRow, oneRowId] = routine_LeftRight(randImgIdx, randMap, image1_stru
 %         data3 = fetchColor( meshX, meshY, depthData,image1_struct, image2_struct );
 %         cost_2 = computeZNCC(data1, data3);
         [cost_2, id_2] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, idSelected, data1);
+        cost_2 = addBinaryCost( cost_2, depthData(1), depthMap(row, col - 1));
 %         
         depthData(:) = depthMap(row, col);
 %         data4 = fetchColor( meshX, meshY, depthData, image1_struct, image2_struct);
 %         cost_3 = computeZNCC(data1, data4);
          [cost_3, id_3] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, idSelected, data1);
+         cost_3 = addBinaryCost( cost_3, depthData(1), depthMap(row, col - 1));
+         
         if(cost_3 <cost_1 || cost_3 <cost_2)
             if(cost_2 < cost_1)
                 depthMap(row,col) = depthMap(row,col-1);

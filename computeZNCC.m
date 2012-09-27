@@ -4,7 +4,7 @@ function cost = computeZNCC(data1, data2)
 
 
 if(all(data2 == 0))
-    cost = -2;   
+    cost = -10;   
 else
     dataSize = numel(data1); 
     dataSizePerChannel = dataSize/3;
