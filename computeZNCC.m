@@ -1,6 +1,6 @@
 function cost = computeZNCC(data1, data2)
 % r,g,b
-global MATCH_METHOD;
+% global MATCH_METHOD;
 
 
 if(all(data2 == 0))
@@ -10,17 +10,17 @@ else
     dataSizePerChannel = dataSize/3;
     c = zeros(1,3);    
     
-    if( strcmp(MATCH_METHOD, 'ZNCC'))
-        c(1) = computeZNCC_oneChannel(data1(1:dataSizePerChannel), data2(1:dataSizePerChannel));
-        c(2) = computeZNCC_oneChannel(data1(dataSizePerChannel+1: dataSizePerChannel*2), data2(dataSizePerChannel+1: dataSizePerChannel*2));
-        c(3) = computeZNCC_oneChannel(data1(dataSizePerChannel*2+1: dataSize), data2(dataSizePerChannel*2+1: dataSize));
-    elseif( strcmp(MATCH_METHOD, 'NCC'))
+%     if( strcmp(MATCH_METHOD, 'ZNCC'))
+%         c(1) = computeZNCC_oneChannel(data1(1:dataSizePerChannel), data2(1:dataSizePerChannel));
+%         c(2) = computeZNCC_oneChannel(data1(dataSizePerChannel+1: dataSizePerChannel*2), data2(dataSizePerChannel+1: dataSizePerChannel*2));
+%         c(3) = computeZNCC_oneChannel(data1(dataSizePerChannel*2+1: dataSize), data2(dataSizePerChannel*2+1: dataSize));
+%     elseif( strcmp(MATCH_METHOD, 'NCC'))
         c(1) = computeNCC_oneChannel(data1(1:dataSizePerChannel), data2(1:dataSizePerChannel));
         c(2) = computeNCC_oneChannel(data1(dataSizePerChannel+1: dataSizePerChannel*2), data2(dataSizePerChannel+1: dataSizePerChannel*2));
         c(3) = computeNCC_oneChannel(data1(dataSizePerChannel*2+1: dataSize), data2(dataSizePerChannel*2+1: dataSize));        
-    else
-        fprintf(1, 'error in choosing normalization method');
-    end
+%     else
+%         fprintf(1, 'error in choosing normalization method');
+%     end
     cost = mean(c);
 end
 end

@@ -1,10 +1,11 @@
 function pathStereo(img1_struct, otherImage_struct)
 
-global near; global far; global halfWindowSize; global MATCH_METHOD;
-near = 3.5;
-far = 13.5;
-MATCH_METHOD = 'NCC';
+global near; global far; global halfWindowSize; 
+near = 0.5;
+far = 4.5;
+% MATCH_METHOD = 'NCC';
 halfWindowSize = 5; % window size is 7 by 7
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_new_smallRange_idmap_NCC_randOjbect_allImage';
 %--------------------------------------------- 
 
 image1 = double(imread(img1_struct.imageName));
@@ -26,7 +27,7 @@ RandStream.setDefaultStream(s);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
 idMap = randi(numel(otherImage_struct), [h,w]);
-numOfIteration = 5;
+numOfIteration = 1000;
 
 tic;
 if(matlabpool('size') ~=0)
@@ -34,7 +35,7 @@ if(matlabpool('size') ~=0)
 end
 matlabpool open;
 
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_new_smallRange_idmap_allImg';
+
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);
 end
