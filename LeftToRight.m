@@ -13,14 +13,13 @@ randImgIdx = randi(numOfOtherImages, [h,w]);
 localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));
 emptyId = zeros(size(randMap));
-% tic;
+
 parfor row = 1:h          
 % for row = 1:h          
     [emptyMap(row, :), emptyId(row,:)] = routine_LeftRight(randImgIdx, randMap, image1_struct, otherImage_struct, depthMap, idMap, row, localWindowSize, rowWidth);
 %     fprintf('row %d is finished\n', row);
 end
-% t = toc;
-% fprintf(1, 'elapsed time is %f', t);
+
 depthMap = emptyMap;
 idMap = emptyId;
 
@@ -30,7 +29,7 @@ function [oneRow, oneRowId] = routine_LeftRight(randImgIdx, randMap, image1_stru
     [h,w,~] = size(image1_struct.imageData);
 %     oneRow = zeros(1,w);
     
-    for col = 2:w   
+    for col = 2:w         
         colStart = max(1, col - halfWindowSize); colEnd = min(w, col + halfWindowSize);         
         rowStart = max(1, row - rowWidth); rowEnd = min(h, row + rowWidth);
 %         ----------------------------------

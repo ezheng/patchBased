@@ -2,23 +2,28 @@ function pathStereo(img1_struct, otherImage_struct)
 
 global near; global far; global halfWindowSize; 
 near = 0.5;
-far = 4.5;
+far = 12.0;
+isUseColor = false;
 % MATCH_METHOD = 'NCC';
-halfWindowSize = 5; % window size is 7 by 7
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_new_smallRange_idmap_NCC_randOjbect_allImage';
+halfWindowSize = 7; % window size is 7 by 7
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_new_smallRange_idmap_NCC_brandenburg_1_2to10_binary_gray';
 %--------------------------------------------- 
 
-image1 = double(imread(img1_struct.imageName));
+image1 = im2double(imread(img1_struct.imageName));
+image1 = convertColor(image1, isUseColor);
 img1_struct.imageData = image1; [h, w, d] = size(image1); img1_struct.h = h; img1_struct.w = w; img1_struct.d = d;
 
 for i = 1:numel(otherImage_struct)
-    image2 = double(imread(otherImage_struct(i).imageName));
+    image2 = im2double(imread(otherImage_struct(i).imageName));
+    image2 = convertColor(image2, isUseColor);
     otherImage_struct(i).imageData = image2; 
-    [h, w, d] = size(image2); otherImage_struct(i).h = h; otherImage_struct(i).w = w; otherImage_struct(i).d = d;
+    [hh, ww, dd] = size(image2); otherImage_struct(i).h = hh; otherImage_struct(i).w = ww; otherImage_struct(i).d = dd;
 end
 % ------------ verify camera poses
-%  F = fundfromcameras(img1_struct.K * [img1_struct.R, img1_struct.T], img2_struct.K * [img2_struct.R, img2_struct.T]);
-%  fig=vgg_gui_F(uint8(img2_struct.imageData), uint8(img1_struct.imageData),F);
+%   F = fundfromcameras(img1_struct.K * [img1_struct.R, img1_struct.T], otherImage_struct(1).K * [otherImage_struct(1).R, otherImage_struct(1).T]);
+%   fig=vgg_gui_F(uint8(otherImage_struct(1).imageData), uint8(img1_struct.imageData),F);
+% F = fundfromcameras(otherImage_struct(2).K * [otherImage_struct(2).R, otherImage_struct(2).T], img1_struct.K * [img1_struct.R, img1_struct.T]);
+% fig=vgg_gui_F(uint8(img1_struct.imageData), uint8(otherImage_struct(2).imageData),F);
 
 % ------------
 
