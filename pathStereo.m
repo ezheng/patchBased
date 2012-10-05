@@ -6,7 +6,7 @@ far = 12.0;
 isUseColor = true;
 % MATCH_METHOD = 'NCC';
 halfWindowSize = 5; % window size is 7 by 7
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5\';
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel\';
 %--------------------------------------------- 
 
 image1 = im2double(imread(img1_struct.imageName));
@@ -18,8 +18,7 @@ for i = 1:numel(otherImage_struct)
     image2 = convertColor(image2, isUseColor);
     otherImage_struct(i).imageData = image2; 
     [hh, ww, dd] = size(image2); otherImage_struct(i).h = hh; otherImage_struct(i).w = ww; otherImage_struct(i).d = dd;
-%     assign a random id map for each image
-   
+%     assign a random id map for each image   
 end
 % ------------ verify camera poses
 %   F = fundfromcameras(img1_struct.K * [img1_struct.R, img1_struct.T], otherImage_struct(1).K * [otherImage_struct(1).R, otherImage_struct(1).T]);
@@ -32,7 +31,9 @@ s = RandStream('mcg16807','Seed',0);
 RandStream.setDefaultStream(s);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
-mapDistribution = ones(hh, ww, numel(otherImage_struct)) * 0.5;
+% mapDistribution = ones(hh, ww, numel(otherImage_struct)) * 0.5;
+mapDistribution = rand(hh, ww, numel(otherImage_struct));
+
 
 numOfIteration = 1000;
 

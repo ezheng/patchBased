@@ -51,7 +51,9 @@ switch( maxIdx(maxCostIdx))
 end
 
 % update the distribution
-allProb = max(allProb,[], 2); % same id, different depth, this would contribute 
+% allProb = max(allProb,[], 2); % same id, different depth, this would contribute 
+allProb = allProb(:, maxIdx(maxCostIdx));
+
 
 % update distribution for current distribution.
 mapDistribution = mapDistribution2;
