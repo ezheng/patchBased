@@ -1,4 +1,4 @@
-function [depthMap, idMap ]= proporgation(image1_struct, image2_struct, depthMap,idMap, flag, width)
+function [depthMap, mapDistribution]= proporgation(image1_struct, image2_struct, depthMap,mapDistribution, flag, width)
 
 % flag:
 % 0    left->right
@@ -7,13 +7,13 @@ function [depthMap, idMap ]= proporgation(image1_struct, image2_struct, depthMap
 % 3    down -> top
 switch (flag)
     case (0)
-        [depthMap, idMap] = LeftToRight(image1_struct, image2_struct, depthMap,idMap , width);
+        [depthMap, mapDistribution] = LeftToRight(image1_struct, image2_struct, depthMap, mapDistribution, width);
     case (1)
-        [depthMap, idMap] = RightToLeft(image1_struct, image2_struct, depthMap,idMap,  width);
+        [depthMap, mapDistribution] = RightToLeft(image1_struct, image2_struct, depthMap, mapDistribution, width);
     case (2)
-        [depthMap, idMap] = TopToDown(image1_struct, image2_struct, depthMap, idMap, width);
+        [depthMap, mapDistribution] = TopToDown(image1_struct, image2_struct, depthMap, mapDistribution, width);
     case (3)
-        [depthMap, idMap] = DownToTop(image1_struct, image2_struct, depthMap, idMap, width);
+        [depthMap, mapDistribution] = DownToTop(image1_struct, image2_struct, depthMap, mapDistribution, width);
     otherwise
         fprintf(1, 'proporgation direction is not recognized');
 end

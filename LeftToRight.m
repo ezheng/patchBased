@@ -1,76 +1,62 @@
-function [depthMap, idMap] = LeftToRight(image1_struct, otherImage_struct, depthMap,idMap,rowWidth)
-if(nargin <4)
-    rowWidth = 0;
-end
+function [depthMap, mapDistribution] = LeftToRight(image1_struct, otherImage_struct, depthMap, mapDistribution, rowWidth)
+
 global far; global near; global halfWindowSize;
 % 
 h = image1_struct.h;
 w = image1_struct.w;
 randMap = rand(h, w) * (far - near) + near;
-numOfOtherImages = numel(otherImage_struct);
-randImgIdx = randi(numOfOtherImages, [h,w]);
 
 localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));
-emptyId = zeros(size(randMap));
+emptyMapDistribution = zeros(size(mapDistribution));
 
 parfor row = 1:h          
 % for row = 1:h          
-    [emptyMap(row, :), emptyId(row,:)] = routine_LeftRight(randImgIdx, randMap, image1_struct, otherImage_struct, depthMap, idMap, row, localWindowSize, rowWidth);
+    [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth);
 %     fprintf('row %d is finished\n', row);
 end
-
 depthMap = emptyMap;
-idMap = emptyId;
+mapDistribution = emptyMapDistribution;
 
 end
 
-function [oneRow, oneRowId] = routine_LeftRight(randImgIdx, randMap, image1_struct, otherImage_struct, depthMap, idMap, row, halfWindowSize, rowWidth)
+function [oneRow, mapDistribution] = routine_LeftRight(randMap, mapDistribution, image1_struct, otherImage_struct, depthMap, row, halfWindowSize, rowWidth)
+% mapDistribution: a cerntain row for all otherImage 
+
     [h,w,~] = size(image1_struct.imageData);
-%     oneRow = zeros(1,w);
+    gaussianTable = calculateGaussianTable();
     
-    for col = 2:w         
+    for col = 2:w    
+%         if(col == 100)
+%            col 
+%         end
         colStart = max(1, col - halfWindowSize); colEnd = min(w, col + halfWindowSize);         
         rowStart = max(1, row - rowWidth); rowEnd = min(h, row + rowWidth);
 %         ----------------------------------
         data1 = image1_struct.imageData(rowStart:rowEnd, colStart:colEnd, :); 
-         data1 = data1(:);          
-         idSelected = [idMap(row, col - 1), randImgIdx(row,col), idMap(row, col) ];
+        data1 = data1(:);          
 %          ------------------------
         [meshX, meshY] = meshgrid(colStart:colEnd, rowStart:rowEnd); meshX = meshX(:); meshY = meshY(:);
-        depthData = depthMap(rowStart:rowEnd, colStart:colEnd);
-        depthData = depthData(:);
-        
-        depthData(:) = depthMap(row, col-1);        
-%         data2 = fetchColor( meshX, meshY, depthData ,image1_struct, otherImage_struct(selectedID(1)));
-%         cost_1 = computeZNCC(data1, data2);        
-        [cost_1, id_1] = costCalculationGiveId(meshX, meshY, depthData ,image1_struct, otherImage_struct, idSelected, data1);
-        
+%         depthData = zeros(rowStart:rowEnd, colStart:colEnd);
+        numOfElem = (rowEnd - rowStart + 1) * (colEnd - colStart + 1);        
+        depthData = zeros( numOfElem, 3);   
+        depthData(:,1) = depthMap(row, col-1);                  
         %         cost of the rand map                
-        depthData(:) = randMap(row, col);
-%         data3 = fetchColor( meshX, meshY, depthData,image1_struct, image2_struct );
-%         cost_2 = computeZNCC(data1, data3);
-        [cost_2, id_2] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, idSelected, data1);
-        cost_2 = addBinaryCost( cost_2, depthData(1), depthMap(row, col - 1));
-%         
-        depthData(:) = depthMap(row, col);
-%         data4 = fetchColor( meshX, meshY, depthData, image1_struct, image2_struct);
-%         cost_3 = computeZNCC(data1, data4);
-         [cost_3, id_3] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, idSelected, data1);
-         cost_3 = addBinaryCost( cost_3, depthData(1), depthMap(row, col - 1));
-         
-        if(cost_3 <cost_1 || cost_3 <cost_2)
-            if(cost_2 < cost_1)
-                depthMap(row,col) = depthMap(row,col-1);
-                idMap(row, col) = id_1;
-            else
-                depthMap(row,col) = randMap(row,col);
-                idMap(row, col) = id_2;  
-            end
-        else
-            idMap(row,col) = id_3;           
-        end
-    end
+        depthData(:,2) = randMap(row, col);
+%         cost_2 = addBinaryCost( cost_2, depthData(1), depthMap(row, col - 1));
+        depthData(:,3) = depthMap(row, col);
+
+        mapDistribution1 = mapDistribution(1, col - 1, :);
+        mapDistribution1 = mapDistribution1(:);
+        mapDistribution2 = mapDistribution(1, col, :);
+        mapDistribution2 = mapDistribution2(:);
+        
+        [bestDepth, oneRowDistribution] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, data1,...
+             mapDistribution1, mapDistribution2, gaussianTable);
+        depthMap(row, col) = bestDepth;  
+        mapDistribution(1,col,:) = reshape( oneRowDistribution, [1,1,numel(oneRowDistribution)]);
+    end    
     oneRow = depthMap(row,:);   
-    oneRowId = idMap(row,:);
+%     oneRowMapDistribution = mapDistribution(row,:,:);
+
 end

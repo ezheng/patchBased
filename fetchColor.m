@@ -15,9 +15,9 @@ proj = K2 * [R2, T2] * [recovered; ones(1, size(recovered,2))];
 proj = proj./ repmat(proj(3,:), 3,1);
 
 [h,w,~] = size(image2);
-if( all(proj(1,:) > 0) && all(proj(1,:) < w) && all(proj(2,:) > 0) && all(proj(2,:) < h)) % image projection is within the 2nd image
-    color = vgg_interp2(image2, proj(1,:) + 1, proj(2,:) + 1, 'linear');    % +1 is because matlab index starts from 1
-    color = color(:);
-else
-   color = zeros(3 * size(proj,2),1); 
-end
+% if( all(proj(1,:) + 1 > 0) && all(proj(1,:) + 1 < w) && all(proj(2,:) + 1 > 0) && all(proj(2,:) + 1 < h)) % image projection is within the 2nd image
+color = vgg_interp2(image2, proj(1,:) + 1, proj(2,:) + 1, 'linear');    % +1 is because matlab index starts from 1
+color = color(:);   % some pixels may have NaN value. We do not count it in
+% else
+%    color = zeros(3 * size(proj,2),1); 
+% end
