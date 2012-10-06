@@ -2,7 +2,7 @@
 function  [bestDepth, mapDistribution] = costCalculationGiveId(meshX, meshY, depthData,...
     image1_struct, otherImage_struct, data1, mapDistribution1, mapDistribution2, gaussianTable)
 
-numOfSample = 3;
+numOfSample = 1;
 % allCost = zeros(1,3);   % cost for 3 different depth. Only the id with best depth are used for distribution update
 
 if( size(image1_struct.imageData,3) == 1)
