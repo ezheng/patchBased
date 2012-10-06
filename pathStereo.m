@@ -2,19 +2,21 @@ function pathStereo(img1_struct, otherImage_struct)
 
 global near; global far; global halfWindowSize; 
 near = 3;
-far = 12.0;
+far = 8.0;
 isUseColor = true;
 % MATCH_METHOD = 'NCC';
-halfWindowSize = 5; % window size is 7 by 7
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel\';
+halfWindowSize = 4; % window size is 7 by 7
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_onesample\';
 %--------------------------------------------- 
 
 image1 = im2double(imread(img1_struct.imageName));
+image1 = getROI(image1);
 image1 = convertColor(image1, isUseColor);
 img1_struct.imageData = image1; [h, w, d] = size(image1); img1_struct.h = h; img1_struct.w = w; img1_struct.d = d;
 
 for i = 1:numel(otherImage_struct)
     image2 = im2double(imread(otherImage_struct(i).imageName));
+    image2 = getROI(image2);
     image2 = convertColor(image2, isUseColor);
     otherImage_struct(i).imageData = image2; 
     [hh, ww, dd] = size(image2); otherImage_struct(i).h = hh; otherImage_struct(i).w = ww; otherImage_struct(i).d = dd;
@@ -41,7 +43,7 @@ tic;
 if(matlabpool('size') ~=0)
     matlabpool close;    
 end
-matlabpool open;
+matlabpool open 7;
 
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);

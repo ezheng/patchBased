@@ -14,6 +14,10 @@ while ischar(tline)
     image(imageIdx).imageName = words{1};
     K = str2double( words(2:10)); K = reshape(K, 3,3); K = K'; 
     image(imageIdx).K = K;
+    
+    image(imageIdx).K(1,3) = image(imageIdx).K(1,3) - 300;
+    image(imageIdx).K(2,3) = image(imageIdx).K(2,3) - 1200;
+    
     R = str2double( words(11:19)); R = reshape(R, 3,3); R = R';
     image(imageIdx).R = R;    
     image(imageIdx).T = str2double( words(20:22))';
