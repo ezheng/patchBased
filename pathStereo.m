@@ -2,11 +2,11 @@ function pathStereo(img1_struct, otherImage_struct)
 
 global near; global far; global halfWindowSize; 
 near = 3;
-far = 8.0;
+far = 12.0;
 isUseColor = true;
 % MATCH_METHOD = 'NCC';
 halfWindowSize = 4; % window size is 7 by 7
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_onesample\';
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_onesample\';
 %--------------------------------------------- 
 
 image1 = im2double(imread(img1_struct.imageName));
@@ -33,8 +33,8 @@ s = RandStream('mcg16807','Seed',0);
 RandStream.setDefaultStream(s);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
-% mapDistribution = ones(hh, ww, numel(otherImage_struct)) * 0.5;
-mapDistribution = rand(hh, ww, numel(otherImage_struct));
+mapDistribution = ones(hh, ww, numel(otherImage_struct)) * 0.5;
+% mapDistribution = rand(hh, ww, numel(otherImage_struct));
 
 
 numOfIteration = 1000;
