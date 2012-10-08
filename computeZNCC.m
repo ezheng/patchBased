@@ -45,7 +45,7 @@ mask = find( isnan(data2) == 0);
 data1 = data1(mask);
 data2 = data2(mask);
 if(isempty(data1) || isempty(data2))
-   cost = 0; 
+   cost = -1; 
    return;
 end
 data1 = data1 - mean(data1);

@@ -1,4 +1,4 @@
-function [depthMap, mapDistribution] = RightToLeft(image1_struct, otherImage_struct, depthMap, mapDistribution, rowWidth)
+function [depthMap, mapDistribution] = RightToLeft(image1_struct, otherImage_struct, depthMap, mapDistribution, rowWidth, annealing)
 
 global far; global near; global halfWindowSize;
 h = image1_struct.h;
@@ -11,7 +11,7 @@ emptyMapDistribution = zeros(size(mapDistribution));
 % tic;
 parfor row = 1:h          
 % for row = 1:h          
-    [emptyMap(row, :), emptyMapDistribution(row,:,:)] = routine_RightLeft(randMap,  mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth);    
+    [emptyMap(row, :), emptyMapDistribution(row,:,:)] = routine_RightLeft(randMap,  mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);    
 %     fprintf('row %d is finished\n', row);
 end
 % t = toc;
@@ -21,7 +21,7 @@ mapDistribution = emptyMapDistribution;
 
 end
 
-function [oneRow,mapDistribution] = routine_RightLeft(randMap, mapDistribution, image1_struct, otherImage_struct, depthMap,row, halfWindowSize, rowWidth)
+function [oneRow,mapDistribution] = routine_RightLeft(randMap, mapDistribution, image1_struct, otherImage_struct, depthMap,row, halfWindowSize, rowWidth, annealing)
     [h,w,~] = size(image1_struct.imageData);
     gaussianTable = calculateGaussianTable();
 %     oneRow = zeros(1,w);
@@ -50,7 +50,7 @@ function [oneRow,mapDistribution] = routine_RightLeft(randMap, mapDistribution, 
         mapDistribution2 = mapDistribution2(:);        
         
         [bestDepth, oneRowDistribution] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, data1,...
-            mapDistribution1, mapDistribution2, gaussianTable);
+            mapDistribution1, mapDistribution2, gaussianTable, annealing);
         depthMap(row, col) = bestDepth; 
         mapDistribution(1,col,:) = reshape( oneRowDistribution, [1,1,numel(oneRowDistribution)]);
         

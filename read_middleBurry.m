@@ -1,6 +1,8 @@
-function image = read_middleBurry(fileName)
+function image = read_middleBurry(fileName, imageROI)
 
 % fileName = 'C:\Enliang\matlab\patchBased\fountain\fountain - Copy.txt'; 
+% imageROI [top, left, bottom, right]
+
 
 imageIdx = 0;
 fid = fopen(fileName, 'r');
@@ -15,9 +17,13 @@ while ischar(tline)
     K = str2double( words(2:10)); K = reshape(K, 3,3); K = K'; 
     image(imageIdx).K = K;
     
-    image(imageIdx).K(1,3) = image(imageIdx).K(1,3) - 300;
-    image(imageIdx).K(2,3) = image(imageIdx).K(2,3) - 1200;
-    
+%     image(imageIdx).K(1,3) = image(imageIdx).K(1,3) - 300;
+%     image(imageIdx).K(2,3) = image(imageIdx).K(2,3) - 1200;
+if ~isempty(imageROI)
+    image(imageIdx).K(1,3) = image(imageIdx).K(1,3) - imageROI(2);
+    image(imageIdx).K(2,3) = image(imageIdx).K(2,3) - imageROI(1);
+end
+
     R = str2double( words(11:19)); R = reshape(R, 3,3); R = R';
     image(imageIdx).R = R;    
     image(imageIdx).T = str2double( words(20:22))';

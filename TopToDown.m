@@ -1,4 +1,4 @@
-function [depthMap, mapDistribution] = TopToDown(image1_struct, otherImage_struct, depthMap, mapDistribution, colWidth)
+function [depthMap, mapDistribution] = TopToDown(image1_struct, otherImage_struct, depthMap, mapDistribution, colWidth, annealing)
 
 global far; global near; global halfWindowSize;
 h = image1_struct.h;
@@ -11,7 +11,7 @@ emptyMapDistribution = zeros(size(mapDistribution));
 % tic;
 parfor col = 1:w          
 % for col = 1:w          
-    [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth);    
+    [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
 %     fprintf('row %d is finished\n', col);
 end
 % t = toc;
@@ -21,7 +21,7 @@ mapDistribution = emptyMapDistribution;
 
 end
 
-function [oneCol, mapDistribution] = routine_TopDown(randMap, mapDistribution, image1_struct, otherImage_struct, depthMap, col, halfWindowSize, colWidth)
+function [oneCol, mapDistribution] = routine_TopDown(randMap, mapDistribution, image1_struct, otherImage_struct, depthMap, col, halfWindowSize, colWidth, annealing)
     [h,w,~] = size(image1_struct.imageData);
     gaussianTable = calculateGaussianTable();
     for row = 2:h   
@@ -60,7 +60,7 @@ function [oneCol, mapDistribution] = routine_TopDown(randMap, mapDistribution, i
         mapDistribution2 = mapDistribution2(:);
 
         [bestDepth, oneColDistribution] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, data1,...
-            mapDistribution1, mapDistribution2, gaussianTable);
+            mapDistribution1, mapDistribution2, gaussianTable, annealing);
         depthMap(row, col) = bestDepth;
          mapDistribution(row,1,:) = reshape( oneColDistribution, [1,1,numel(oneColDistribution)]);
           
