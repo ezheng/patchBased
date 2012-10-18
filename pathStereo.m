@@ -1,8 +1,10 @@
 function pathStereo(img1_struct, otherImage_struct, imageROI)
 
 global near; global far; global halfWindowSize; 
-near = 3;
-far = 12.0;
+% near = 3;
+% far = 12.0;
+near = 0;
+far = 1;
 isUseColor = true;
 % MATCH_METHOD = 'NCC';
 halfWindowSize = 5; % window size is 7 by 7
@@ -35,6 +37,7 @@ RandStream.setDefaultStream(s);
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
 % mapDistribution = ones(hh, ww, numel(otherImage_struct)) * 0.5;
 mapDistribution = rand(hh, ww, numel(otherImage_struct));
+mapDistribution = mapDistribution./ repmat(sum(mapDistribution,3), [1,1,size(mapDistribution,3)]); % normalization
 
 
 numOfIteration = 1000;
@@ -43,13 +46,15 @@ tic;
 if(matlabpool('size') ~=0)
     matlabpool close;    
 end
-matlabpool open 8;
+% matlabpool open 8;
 
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);
 end
 
 annealing = 0.0;
+
+
 for i = 1:numOfIteration
      annealing = annealing - 0.1;
      if(annealing <= 0) 

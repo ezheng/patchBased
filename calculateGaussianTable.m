@@ -1,7 +1,7 @@
 function gaussianTable = calculateGaussianTable()
 
 
-sigma = 0.2;
+sigma = 0.4;
 theStart = -2; theEnd = 2;
 N = 400;
 % --------------------------------------------------------
