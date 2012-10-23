@@ -3,11 +3,11 @@ function pathStereo(img1_struct, otherImage_struct, imageROI)
 global near; global far; global halfWindowSize; 
 % near = 3;
 % far = 12.0;
-near = 0;
-far = 1;
+near = 0.45;
+far = 0.70;
 isUseColor = true;
 % MATCH_METHOD = 'NCC';
-halfWindowSize = 5; % window size is 7 by 7
+halfWindowSize = 3; % window size is 7 by 7
 depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_3sample_NoAnneal_proporgateDist_smallsigma\';
 %--------------------------------------------- 
 
@@ -46,7 +46,7 @@ tic;
 if(matlabpool('size') ~=0)
     matlabpool close;    
 end
-% matlabpool open 8;
+matlabpool open 8;
 
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);

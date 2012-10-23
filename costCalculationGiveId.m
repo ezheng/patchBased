@@ -6,7 +6,7 @@ function  [bestDepth, mapDistribution] = costCalculationGiveId(meshX, meshY, dep
 % mapDistribution2 = mapDistribution2 * 0.5 + mapDistribution1 * 0.5;
 % mapDistribution2 = mapDistribution1;
 
-numOfSample = 3;
+numOfSample = 5;
 % allCost = zeros(1,3);   % cost for 3 different depth. Only the id with best depth are used for distribution update
 
 if( size(image1_struct.imageData,3) == 1)
@@ -16,9 +16,12 @@ else
 end
 % draw id from random distribution. The current distribution and the left distribution
  
-idSelected{1} = drawSample(mapDistribution1, numOfSample);
-idSelected{2} = drawSample(mapDistribution2, numOfSample);
+% idSelected{1} = drawSample( (mapDistribution1 + mapDistribution2)*0.5, numOfSample);
+idSelected{1} = drawSample( mapDistribution1, numOfSample);
+idSelected{2} = idSelected{1};
 % idSelected = unique([idSelected1(:); idSelected2(:)]);
+% idSelected{1} = [1 2 3 4]';
+% idSelected{2} = [1 2 3 4]';
 
 % numOfId = numel(idSelected);
 % if(numOfId == 1)
@@ -29,8 +32,10 @@ allCost = NaN(numel(otherImage_struct), 3);
 for j = 1:3
     for i = 1:numel(idSelected)
         for k = 1:numel(idSelected{i})
-            data2 = fetchColor( meshX, meshY, depthData(:,j) ,image1_struct, otherImage_struct(idSelected{i}(k)));
-            allCost(idSelected{i}(k), j) = computeZNCC(data1, data2, isUseColor);
+            if(isnan(allCost(idSelected{i}(k), j)))
+                data2 = fetchColor( meshX, meshY, depthData(:,j) ,image1_struct, otherImage_struct(idSelected{i}(k)));
+                allCost(idSelected{i}(k), j) = computeZNCC(data1, data2, isUseColor);
+            end
         end
     end
 end
@@ -75,7 +80,7 @@ end
 probWithBestDepth = calculateProb(1 - costWithBestDepth);
 
 % update distribution for current distribution.
-mapDistribution = (mapDistribution2 + mapDistribution1) * 0.5;
-mapDistribution = mapDistribution .* probWithBestDepth;
-mapDistribution = mapDistribution / sum(mapDistribution); %normalize
-
+% mapDistribution = (mapDistribution2 + mapDistribution1) * 0.5;
+% mapDistribution = mapDistribution .* probWithBestDepth;
+% mapDistribution = mapDistribution / sum(mapDistribution); %normalize
+mapDistribution = probWithBestDepth / sum(probWithBestDepth); %normalize

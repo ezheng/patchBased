@@ -1,7 +1,7 @@
 function main()
 
 % fileName = 'C:\Enliang\MATLAB\patchBased\fountain_yilin\origImage\fountain.txt'; 
-fileName = 'C:\Enliang\data\middlebury\multiView\dinoSparseRing\dinoSR_par.txt';
+fileName = 'C:\Enliang\data\middlebury\multiView\dinoRing\dinoR_par.txt';
 % fileName = 'C:\Enliang\data\randObject\randObject.txt';
 % fileName = 'C:\Enliang\data\brandenburgNight\pickedData.txt';
 % imageROI [top, left, bottom, right]
@@ -13,6 +13,6 @@ image = read_middleBurry(fileName, imageROI);
 
 % do stereo
 
-pathStereo(image(1), image(2:11), imageROI);
+pathStereo(image(31), image([28:30, 32:34]), imageROI);
 
 

@@ -10,7 +10,7 @@ localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));
 emptyMapDistribution = zeros(size(mapDistribution));
 
-parfor row = 1:h          
+parfor row = 1:h
 % for row = 1:h          
     [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
 %     fprintf('row %d is finished\n', row);
@@ -19,6 +19,7 @@ depthMap = emptyMap;
 mapDistribution = emptyMapDistribution;
 
 end
+
 
 function [oneRow, mapDistribution] = routine_LeftRight(randMap, mapDistribution, image1_struct, otherImage_struct, depthMap, row, halfWindowSize, rowWidth, annealing)
 % mapDistribution: a cerntain row for all otherImage 
@@ -50,6 +51,7 @@ function [oneRow, mapDistribution] = routine_LeftRight(randMap, mapDistribution,
         mapDistribution1 = mapDistribution1(:);
         mapDistribution2 = mapDistribution(1, col, :);
         mapDistribution2 = mapDistribution2(:);
+        
         
         [bestDepth, oneRowDistribution] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, data1,...
              mapDistribution1, mapDistribution2, gaussianTable, annealing);
