@@ -10,9 +10,8 @@ localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));
 emptyMapDistribution = zeros(size(mapDistribution));
 
-% parfor row = 1:h
-% for row = 1:h      
-for row = 53
+parfor row = 1:h
+% for row = 1:h          
     if(row == h)
         [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row - 1,:,:), mapDistribution(row,:,:),  mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
     elseif(row == 1)
@@ -34,9 +33,9 @@ function [oneRow, mapDistribution_middle] = routine_LeftRight(randMap, mapDistri
     gaussianTable = calculateGaussianTable();
     
     for col = 2:w    
-        if(col == 252)
-           col 
-        end
+%         if(col == 100)
+%            col 
+%         end
         colStart = max(1, col - halfWindowSize); colEnd = min(w, col + halfWindowSize);         
         rowStart = max(1, row - rowWidth); rowEnd = min(h, row + rowWidth);
 %         ----------------------------------

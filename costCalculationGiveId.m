@@ -43,6 +43,8 @@ for j = 1:3
     end
 end
 
+bestDepthID = calculateVotes(allCost);
+
 % if any(allCost(:) <= -0.95)
 %    allCost % allCost reach to very high value
 % end
@@ -52,19 +54,20 @@ end
 % -------------------------------------------------------------------------
 % find best depth
 
-cost = zeros(numel(idSelected), 1); maxIdx = zeros(numel(idSelected), 1);
+% cost = zeros(numel(idSelected), 1); maxIdx = zeros(numel(idSelected), 1);
 % [~,IA,~] = intersect(idSelected, idSelected1);
 % [cost(1), maxIdx(1)] = max(mean(allCost(idSelected{1},:),1),[], 2);    
 % [~,IA,~] = intersect(idSelected, idSelected2);
 % [cost(2), maxIdx(2)] = max(mean(allCost(idSelected{2},:),1),[], 2);
-for i = 1:numel(idSelected)
+% for i = 1:numel(idSelected)
 %     [~,IA,~] = intersect(idSelected, idSelected1);
-    [cost(i), maxIdx(i)] = max(mean(allCost(idSelected{i},:),1),[], 2);
-end
+%     [cost(i), maxIdx(i)] = max(mean(allCost(idSelected{i},:),1),[], 2);
+% end
 
 
-[~, maxCostIdx ] = max(cost);
-switch( maxIdx(maxCostIdx))
+% [~, maxCostIdx ] = max(cost);
+% switch( maxIdx(maxCostIdx))
+switch(bestDepthID)
     case 1
         bestDepth = depthData(1,1);
     case 2
@@ -78,11 +81,11 @@ end
 % allProb = lookUpGaussiangTable( 1 - allCost, gaussianTable);
 % allProb = allProb(:, maxIdx(maxCostIdx));
 
-costWithBestDepth = allCost(:, maxIdx(maxCostIdx));
+costWithBestDepth = allCost(:, bestDepthID);
 nonTestedId = find(isnan(costWithBestDepth));
 for i = 1:numel(nonTestedId)
     idx= nonTestedId(i);
-    data2 = fetchColor( meshX, meshY, depthData(:,maxIdx(maxCostIdx)), image1_struct, otherImage_struct(idx));
+    data2 = fetchColor( meshX, meshY, depthData(:,bestDepthID), image1_struct, otherImage_struct(idx));
     costWithBestDepth(idx) = computeZNCC(data1, data2, isUseColor);
 end
 

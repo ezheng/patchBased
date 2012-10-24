@@ -46,7 +46,7 @@ tic;
 if(matlabpool('size') ~=0)
     matlabpool close;    
 end
-% matlabpool open 8;
+matlabpool open 8;
 
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);
@@ -60,7 +60,7 @@ for i = 1:numOfIteration
      if(annealing <= 0) 
          annealing = 0;
      end
-     load(fullfile(depthFileSavePath, ['loop', num2str(1), '_', '3.mat']));
+%      load(fullfile(depthFileSavePath, ['loop', num2str(1), '_', '3.mat']));
      
      [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap,mapDistribution, 0, halfWindowSize, annealing);
      saveImg(depthMap,mapDistribution, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']));
