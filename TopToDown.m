@@ -11,8 +11,19 @@ emptyMapDistribution = zeros(size(mapDistribution));
 % tic;
 parfor col = 1:w          
 % for col = 1:w          
-    [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
+%     [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
 %     fprintf('row %d is finished\n', col);
+
+    if(col == w)
+        [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:, col-1, :),mapDistribution(:,col,:),mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
+    elseif(col == 1)
+        [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:, col, :),mapDistribution(:,col + 1,:),mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
+    else
+        [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:, col - 1, :),mapDistribution(:,col + 1,:), mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
+    end
+
+
+
 end
 % t = toc;
 % fprintf(1, 'elapsed time is %f', t);
@@ -21,7 +32,7 @@ mapDistribution = emptyMapDistribution;
 
 end
 
-function [oneCol, mapDistribution] = routine_TopDown(randMap, mapDistribution, image1_struct, otherImage_struct, depthMap, col, halfWindowSize, colWidth, annealing)
+function [oneCol, mapDistribution_middle] = routine_TopDown(randMap, mapDistribution_left, mapDistribution_right, mapDistribution_middle, image1_struct, otherImage_struct, depthMap, col, halfWindowSize, colWidth, annealing)
     [h,w,~] = size(image1_struct.imageData);
     gaussianTable = calculateGaussianTable();
     for row = 2:h   
@@ -54,15 +65,32 @@ function [oneCol, mapDistribution] = routine_TopDown(randMap, mapDistribution, i
         depthData(:,3) = depthMap(row, col);
 %         data4 = fetchColor( meshX, meshY, depthData, image1_struct, image2_struct);
 %         cost_3 = computeZNCC(data1, data4);
-        mapDistribution1 = mapDistribution(row - 1, 1 , :);
-        mapDistribution1 = mapDistribution1(:);
-        mapDistribution2 = mapDistribution(row, 1, :);
-        mapDistribution2 = mapDistribution2(:);
 
+% -------------------------------------------------------------------------
+        mapDistribution1 = mapDistribution_middle(row - 1, 1 , :);
+        mapDistribution1 = mapDistribution1(:);
+        
+        mapDistribution2 = mapDistribution_middle(row, 1, :);
+        mapDistribution2 = mapDistribution2(:);
+        
+        if(row == h)
+            mapDistribution3 = mapDistribution_middle(row, 1, :);
+        else
+            mapDistribution3 = mapDistribution_middle(row + 1, 1, :);
+        end
+        mapDistribution3 = mapDistribution3(:);
+        
+        mapDistribution4 = mapDistribution_left(row, 1, :);
+        mapDistribution4 = mapDistribution4(:);
+        
+        mapDistribution5 = mapDistribution_right(row, 1, :);
+        mapDistribution5 = mapDistribution5(:);
+        
+% -------------------------------------------------------------------------
         [bestDepth, oneColDistribution] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, data1,...
-            mapDistribution1, mapDistribution2, gaussianTable, annealing);
+            mapDistribution1, mapDistribution2, mapDistribution3, mapDistribution4, mapDistribution5, gaussianTable, annealing);
         depthMap(row, col) = bestDepth;
-         mapDistribution(row,1,:) = reshape( oneColDistribution, [1,1,numel(oneColDistribution)]);
+         mapDistribution_middle(row,1,:) = reshape( oneColDistribution, [1,1,numel(oneColDistribution)]);
           
 %          cost_3 = addBinaryCost(cost_3, depthData(1), depthMap(row - 1, col));
 %         if(cost_3 < cost_1 || cost_3 < cost_2)            

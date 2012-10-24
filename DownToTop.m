@@ -11,8 +11,16 @@ emptyMapDistribution = zeros(size(mapDistribution));
 
 parfor col = 1:w          
 % for col = 1:w
-    [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_DownTop( randMap,mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
+%     [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_DownTop( randMap,mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
 %     fprintf('row %d is finished\n', col);
+    if(col == w)
+        [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_DownTop(randMap, mapDistribution(:, col - 1, :),mapDistribution(:,col,:),mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
+    elseif(col == 1)
+        [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_DownTop(randMap, mapDistribution(:, col, :),mapDistribution(:,col + 1,:),mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
+    else
+        [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_DownTop(randMap, mapDistribution(:, col - 1, :),mapDistribution(:,col + 1,:), mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
+    end
+
 end
 % t = toc;
 % fprintf(1, 'elapsed time is %f', t);
@@ -20,7 +28,7 @@ depthMap = emptyMap;
 mapDistribution = emptyMapDistribution;
 end
 
-function [oneCol, mapDistribution] = routine_DownTop(randMap, mapDistribution, image1_struct, otherImage_struct, depthMap, col, halfWindowSize, colWidth, annealing)
+function [oneCol, mapDistribution_middle] = routine_DownTop(randMap, mapDistribution_left, mapDistribution_right, mapDistribution_middle, image1_struct, otherImage_struct, depthMap, col, halfWindowSize, colWidth, annealing)
     [h,w,~] = size(image1_struct.imageData);
     gaussianTable = calculateGaussianTable();
     
@@ -57,18 +65,35 @@ function [oneCol, mapDistribution] = routine_DownTop(randMap, mapDistribution, i
        
 %         data4 = fetchColor( meshX, meshY, depthData, image1_struct, image2_struct);
 %         cost_3 = computeZNCC(data1, data4);   
-         mapDistribution1 = mapDistribution(row + 1, 1 , :);
+% --------------------------------------------------------------------------
+         mapDistribution1 = mapDistribution_middle(row + 1, 1 , :);
         mapDistribution1 = mapDistribution1(:);
-        mapDistribution2 = mapDistribution(row, 1, :);
+        
+        mapDistribution2 = mapDistribution_middle(row, 1, :);
         mapDistribution2 = mapDistribution2(:);
-    
 
+        if(row == 1)
+            mapDistribution3 = mapDistribution_middle(row, 1, :);
+        else
+            mapDistribution3 = mapDistribution_middle(row - 1, 1, :);
+        end
+        mapDistribution3 = mapDistribution3(:);
+        
+        mapDistribution4 = mapDistribution_left(row, 1, :);
+        mapDistribution4 = mapDistribution4(:);
+        
+        mapDistribution5 = mapDistribution_right(row, 1, :);
+        mapDistribution5 = mapDistribution5(:);
+        
+% -------------------------------------------------------------------------
         [bestDepth, oneColDistribution] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct,  data1,...
-            mapDistribution1, mapDistribution2, gaussianTable, annealing);
+            mapDistribution1, mapDistribution2, mapDistribution3, mapDistribution4, mapDistribution5, gaussianTable, annealing);
         
         depthMap(row, col) = bestDepth;
-         mapDistribution(row,1,:) = reshape( oneColDistribution, [1,1,numel(oneColDistribution)]);
+         mapDistribution_middle(row,1,:) = reshape( oneColDistribution, [1,1,numel(oneColDistribution)]);
     end
     oneCol = depthMap(:,col);
 
 end
+
+

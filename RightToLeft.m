@@ -11,8 +11,17 @@ emptyMapDistribution = zeros(size(mapDistribution));
 % tic;
 parfor row = 1:h          
 % for row = 1:h          
-    [emptyMap(row, :), emptyMapDistribution(row,:,:)] = routine_RightLeft(randMap,  mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);    
+%     [emptyMap(row, :), emptyMapDistribution(row,:,:)] = routine_RightLeft(randMap,  mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);    
 %     fprintf('row %d is finished\n', row);
+    if(row == h)
+        [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_RightLeft(randMap, mapDistribution(row - 1,:,:), mapDistribution(row,:,:),  mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
+    elseif(row == 1)
+        [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_RightLeft(randMap, mapDistribution(row, :, :),   mapDistribution(row + 1, :, :), mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
+    else
+        [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_RightLeft(randMap, mapDistribution(row - 1,:,:), mapDistribution(row + 1,:,:), mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
+    end
+
+
 end
 % t = toc;
 % fprintf(1, 'elapsed time is %f', t);
@@ -21,7 +30,7 @@ mapDistribution = emptyMapDistribution;
 
 end
 
-function [oneRow,mapDistribution] = routine_RightLeft(randMap, mapDistribution, image1_struct, otherImage_struct, depthMap,row, halfWindowSize, rowWidth, annealing)
+function [oneRow,mapDistribution_middle] = routine_RightLeft(randMap, mapDistribution_low, mapDistribution_high, mapDistribution_middle, image1_struct, otherImage_struct, depthMap,row, halfWindowSize, rowWidth, annealing)
     [h,w,~] = size(image1_struct.imageData);
     gaussianTable = calculateGaussianTable();
 %     oneRow = zeros(1,w);
@@ -43,16 +52,30 @@ function [oneRow,mapDistribution] = routine_RightLeft(randMap, mapDistribution, 
         depthData(:, 1) = depthMap(row, col+1);       
         depthData(:, 2) = randMap(row, col);
         depthData(:, 3) = depthMap(row, col);
-        
-        mapDistribution1 = mapDistribution(1, col + 1, :);
+% ----------------------------------------------------------------------------------------------------        
+        mapDistribution1 = mapDistribution_middle(1, col + 1, :);
         mapDistribution1 = mapDistribution1(:);
-        mapDistribution2 = mapDistribution(1, col, :);
-        mapDistribution2 = mapDistribution2(:);        
         
+        mapDistribution2 = mapDistribution_middle(1, col, :);
+        mapDistribution2 = mapDistribution2(:);  
+        
+        if(col == 1)
+            mapDistribution3 = mapDistribution_middle(1, col, :);
+        else
+            mapDistribution3 = mapDistribution_middle(1, col - 1, :);
+        end
+        mapDistribution3 = mapDistribution3(:);
+        
+        mapDistribution4 = mapDistribution_low(1, col, :);
+        mapDistribution4 = mapDistribution4(:);
+        
+        mapDistribution5 = mapDistribution_high(1, col, :);
+        mapDistribution5 = mapDistribution5(:);
+% --------------------------------------------------------------------------
         [bestDepth, oneRowDistribution] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, data1,...
-            mapDistribution1, mapDistribution2, gaussianTable, annealing);
+            mapDistribution1, mapDistribution2, mapDistribution3, mapDistribution4, mapDistribution5, gaussianTable, annealing);
         depthMap(row, col) = bestDepth; 
-        mapDistribution(1,col,:) = reshape( oneRowDistribution, [1,1,numel(oneRowDistribution)]);
+        mapDistribution_middle(1,col,:) = reshape(oneRowDistribution, [1,1,numel(oneRowDistribution)]);
         
     end
     oneRow = depthMap(row,:);

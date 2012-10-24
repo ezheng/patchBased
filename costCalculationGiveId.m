@@ -1,6 +1,7 @@
 % function cost = costCalculationGiveId(meshX, meshY, depthData ,image1_struct, otherImage_struct,  data1)
 function  [bestDepth, mapDistribution] = costCalculationGiveId(meshX, meshY, depthData,...
-    image1_struct, otherImage_struct, data1, mapDistribution1, mapDistribution2, gaussianTable, annealing)
+    image1_struct, otherImage_struct, data1, mapDistribution1, mapDistribution2, mapDistribution3, mapDistribution4, mapDistribution5,...
+    gaussianTable, annealing)
 
 % propogate distribution:
 % mapDistribution2 = mapDistribution2 * 0.5 + mapDistribution1 * 0.5;
@@ -18,7 +19,9 @@ end
  
 % idSelected{1} = drawSample( (mapDistribution1 + mapDistribution2)*0.5, numOfSample);
 idSelected{1} = drawSample( mapDistribution1, numOfSample);
-idSelected{2} = idSelected{1};
+idSelected{2} = drawSample( mapDistribution3, numOfSample);
+idSelected{3} = drawSample( mapDistribution4, numOfSample);
+idSelected{4} = drawSample( mapDistribution5, numOfSample);
 % idSelected = unique([idSelected1(:); idSelected2(:)]);
 % idSelected{1} = [1 2 3 4]';
 % idSelected{2} = [1 2 3 4]';
@@ -48,11 +51,17 @@ end
 % 
 % -------------------------------------------------------------------------
 % find best depth
-cost = zeros(2, 1); maxIdx = zeros(2, 1);
+
+cost = zeros(numel(idSelected), 1); maxIdx = zeros(numel(idSelected), 1);
 % [~,IA,~] = intersect(idSelected, idSelected1);
-[cost(1), maxIdx(1)] = max(mean(allCost(idSelected{1},:),1),[], 2);    
+% [cost(1), maxIdx(1)] = max(mean(allCost(idSelected{1},:),1),[], 2);    
 % [~,IA,~] = intersect(idSelected, idSelected2);
-[cost(2), maxIdx(2)] = max(mean(allCost(idSelected{2},:),1),[], 2);
+% [cost(2), maxIdx(2)] = max(mean(allCost(idSelected{2},:),1),[], 2);
+for i = 1:numel(idSelected)
+%     [~,IA,~] = intersect(idSelected, idSelected1);
+    [cost(i), maxIdx(i)] = max(mean(allCost(idSelected{i},:),1),[], 2);
+end
+
 
 [~, maxCostIdx ] = max(cost);
 switch( maxIdx(maxCostIdx))
