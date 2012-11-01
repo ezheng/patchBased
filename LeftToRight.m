@@ -1,4 +1,4 @@
-function [depthMap, mapDistribution] = LeftToRight(image1_struct, otherImage_struct, depthMap, mapDistribution, rowWidth, annealing)
+function [depthMap, mapDistribution] = LeftToRight(image1_struct, otherImage_struct, depthMap, mapDistribution, rowWidth, annealing, isUseMex)
 
 global far; global near; global halfWindowSize;
 % 
@@ -10,19 +10,25 @@ localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));
 emptyMapDistribution = zeros(size(mapDistribution));
 
-parfor row = 1:h
-% for row = 1:h          
-    if(row == h)
-        [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row - 1,:,:), mapDistribution(row,:,:),  mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
-    elseif(row == 1)
-        [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row, :, :),   mapDistribution(row + 1, :, :),   mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
-    else
-        [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row - 1,:,:), mapDistribution(row + 1,:,:), mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
+if(isUseMex)
+    tic
+    [depthMap, mapDistribution] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 0);
+    toc
+else
+    parfor row = 1:h
+%     for row = 1:h
+        if(row == h)
+            [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row - 1,:,:), mapDistribution(row,:,:),  mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
+        elseif(row == 1)
+            [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row, :, :),   mapDistribution(row + 1, :, :),   mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
+        else
+            [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row - 1,:,:), mapDistribution(row + 1,:,:), mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
+        end
+        %     fprintf('row %d is finished\n', row);
     end
-%     fprintf('row %d is finished\n', row);
+    depthMap = emptyMap;
+    mapDistribution = emptyMapDistribution;
 end
-depthMap = emptyMap;
-mapDistribution = emptyMapDistribution;
 
 end
 

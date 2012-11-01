@@ -21,3 +21,12 @@ color = color(:);   % some pixels may have NaN value. We do not count it in
 % else
 %    color = zeros(3 * size(proj,2),1); 
 % end
+
+
+% n =  [0,0,1]';
+% R = R2 * R1'; 
+% T = R2 * (C2 - C1);
+% H_ba = R - T*n'/z(2);
+% p = K2 * H_ba / (K1) *  [x(2), y(2), 1.0]';
+% p = p/p(3)
+% proj(:,2)

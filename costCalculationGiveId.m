@@ -19,9 +19,10 @@ end
  
 % idSelected{1} = drawSample( (mapDistribution1 + mapDistribution2)*0.5, numOfSample);
 idSelected{1} = drawSample( mapDistribution1, numOfSample);
-idSelected{2} = drawSample( mapDistribution3, numOfSample);
-idSelected{3} = drawSample( mapDistribution4, numOfSample);
-idSelected{4} = drawSample( mapDistribution5, numOfSample);
+idSelected{2} = drawSample( mapDistribution2, numOfSample);
+idSelected{3} = drawSample( mapDistribution3, numOfSample);
+idSelected{4} = drawSample( mapDistribution4, numOfSample);
+idSelected{5} = drawSample( mapDistribution5, numOfSample);
 % idSelected = unique([idSelected1(:); idSelected2(:)]);
 % idSelected{1} = [1 2 3 4]';
 % idSelected{2} = [1 2 3 4]';
@@ -43,7 +44,7 @@ for j = 1:3
     end
 end
 
-bestDepthID = calculateVotes(allCost);
+bestDepthID = calculateVotes(allCost, idSelected);
 
 % if any(allCost(:) <= -0.95)
 %    allCost % allCost reach to very high value

@@ -1,14 +1,16 @@
 function pathStereo(img1_struct, otherImage_struct, imageROI)
 
 global near; global far; global halfWindowSize; 
-% near = 3;
-% far = 12.0;
-near = 0.45;
-far = 0.70;
+near = 5;
+far = 25.0;
+% near = 0.45;
+% far = 0.70;
 isUseColor = true;
+isUseMex = true;
 % MATCH_METHOD = 'NCC';
-halfWindowSize = 3; % window size is 7 by 7
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_3sample_NoAnneal_proporgateDist_smallsigma\';
+halfWindowSize = 4; % window size is 7 by 7
+% depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_3sample_NoAnneal_proporgateDist_smallsigma\';
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\herzjesu\';
 %--------------------------------------------- 
 
 image1 = im2double(imread(img1_struct.imageName));
@@ -46,7 +48,7 @@ tic;
 if(matlabpool('size') ~=0)
     matlabpool close;    
 end
-matlabpool open 8;
+% matlabpool open 8;
 
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);
@@ -54,7 +56,8 @@ end
 
 annealing = 0.0;
 
-
+addpath('C:\Enliang\cpp\patchMatch_mex\build_64\Release\');
+% addpath('C:\Enliang\cpp\patchMatch_mex\build_64\Debug\');
 for i = 1:numOfIteration
      annealing = annealing - 0.1;
      if(annealing <= 0) 
@@ -62,19 +65,19 @@ for i = 1:numOfIteration
      end
 %      load(fullfile(depthFileSavePath, ['loop', num2str(1), '_', '3.mat']));
      
-     [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap,mapDistribution, 0, halfWindowSize, annealing);
+     [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap,mapDistribution, 0, halfWindowSize, annealing, isUseMex);
      saveImg(depthMap,mapDistribution, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']));
      
 %      A =  rand(h,w) * (far - near) + near; % depthMap initialization;
 %      A =  rand(h,w) * (far - near) + near;
 %      load loop1_1.mat;
-    [depthMap,mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap, mapDistribution, 2, halfWindowSize, annealing);
+    [depthMap,mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap, mapDistribution, 2, halfWindowSize, annealing, isUseMex);
     saveImg(depthMap, mapDistribution, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '1.mat']));
      
-    [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap, mapDistribution, 1, halfWindowSize, annealing);
+    [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap, mapDistribution, 1, halfWindowSize, annealing, isUseMex);
     saveImg(depthMap, mapDistribution, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '2.mat']));
 %      
-    [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap, mapDistribution, 3, halfWindowSize, annealing);
+    [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap, mapDistribution, 3, halfWindowSize, annealing, isUseMex);
     saveImg(depthMap, mapDistribution, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '3.mat']));  
 %     
     fprintf(1, 'Iteration %i is finished\n', i);

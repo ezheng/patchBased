@@ -1,4 +1,4 @@
-function [depthMap, mapDistribution] = TopToDown(image1_struct, otherImage_struct, depthMap, mapDistribution, colWidth, annealing)
+function [depthMap, mapDistribution] = TopToDown(image1_struct, otherImage_struct, depthMap, mapDistribution, colWidth, annealing,  isUseMex)
 
 global far; global near; global halfWindowSize;
 h = image1_struct.h;
@@ -8,27 +8,31 @@ randMap = rand(h, w) * (far - near) + near;
 localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));
 emptyMapDistribution = zeros(size(mapDistribution));
-% tic;
-parfor col = 1:w          
-% for col = 1:w          
-%     [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
-%     fprintf('row %d is finished\n', col);
 
-    if(col == w)
-        [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:, col-1, :),mapDistribution(:,col,:),mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
-    elseif(col == 1)
-        [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:, col, :),mapDistribution(:,col + 1,:),mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
-    else
-        [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:, col - 1, :),mapDistribution(:,col + 1,:), mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);    
+if(isUseMex)
+     tic
+    [depthMap, mapDistribution] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 1);
+    toc
+else    
+    % tic;
+    parfor col = 1:w
+        % for col = 1:w
+        %     [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);
+        %     fprintf('row %d is finished\n', col);
+        
+        if(col == w)
+            [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:, col-1, :),mapDistribution(:,col,:),mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);
+        elseif(col == 1)
+            [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:, col, :),mapDistribution(:,col + 1,:),mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);
+        else
+            [emptyMap(:, col), emptyMapDistribution(:,col,:)] = routine_TopDown(randMap, mapDistribution(:, col - 1, :),mapDistribution(:,col + 1,:), mapDistribution(:,col,:), image1_struct, otherImage_struct, depthMap, col, localWindowSize, colWidth, annealing);
+        end
     end
-
-
-
-end
 % t = toc;
 % fprintf(1, 'elapsed time is %f', t);
 depthMap = emptyMap;
 mapDistribution = emptyMapDistribution;
+end
 
 end
 
