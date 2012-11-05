@@ -1,4 +1,4 @@
-function [depthMap, mapDistribution] = DownToTop(image1_struct, otherImage_struct, depthMap,mapDistribution,  colWidth, annealing, isUseMex)
+function [orientationMap, depthMap, mapDistribution] = DownToTop(orientationMap, image1_struct, otherImage_struct, depthMap,mapDistribution,  colWidth, annealing, isUseMex)
 
 global far; global near; global halfWindowSize;
 h = image1_struct.h;
@@ -12,7 +12,7 @@ emptyMapDistribution = zeros(size(mapDistribution));
 
 if(isUseMex)
     tic
-    [depthMap, mapDistribution] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 3);
+    [depthMap, mapDistribution,orientationMap] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 3, orientationMap);
     toc
 else    
     parfor col = 1:w

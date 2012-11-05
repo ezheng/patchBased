@@ -2,14 +2,15 @@ function pathStereo(img1_struct, otherImage_struct, imageROI)
 
 global near; global far; global halfWindowSize; 
 near = 5;
-far = 25.0;
+far = 18.0;
 % near = 0.45;
 % far = 0.70;
 isUseColor = true;
 isUseMex = true;
 % MATCH_METHOD = 'NCC';
-halfWindowSize = 4; % window size is 7 by 7
+halfWindowSize = 4; 
 % depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_3sample_NoAnneal_proporgateDist_smallsigma\';
+% depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\final\';
 depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\herzjesu\';
 %--------------------------------------------- 
 
@@ -37,6 +38,10 @@ s = RandStream('mcg16807','Seed',0);
 RandStream.setDefaultStream(s);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
+orientationMap = rand(h,w,3)*2 - 1;
+orientationMap(:,:,1:2) = 0; orientationMap(:,:,3) = 1.0;
+orientationMap = orientationMap ./ repmat(sqrt(sum(orientationMap.^2,3)),[1,1, size(orientationMap,3)]);
+
 % mapDistribution = ones(hh, ww, numel(otherImage_struct)) * 0.5;
 mapDistribution = rand(hh, ww, numel(otherImage_struct));
 mapDistribution = mapDistribution./ repmat(sum(mapDistribution,3), [1,1,size(mapDistribution,3)]); % normalization
@@ -65,20 +70,21 @@ for i = 1:numOfIteration
      end
 %      load(fullfile(depthFileSavePath, ['loop', num2str(1), '_', '3.mat']));
      
-     [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap,mapDistribution, 0, halfWindowSize, annealing, isUseMex);
-     saveImg(depthMap,mapDistribution, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']));
+      [orientationMap, depthMap, mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap,mapDistribution, 0, halfWindowSize, annealing, isUseMex);
+      saveImg(depthMap,mapDistribution, orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']));
      
 %      A =  rand(h,w) * (far - near) + near; % depthMap initialization;
 %      A =  rand(h,w) * (far - near) + near;
 %      load loop1_1.mat;
-    [depthMap,mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap, mapDistribution, 2, halfWindowSize, annealing, isUseMex);
-    saveImg(depthMap, mapDistribution, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '1.mat']));
+
+    [orientationMap, depthMap,mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, mapDistribution, 2, halfWindowSize, annealing, isUseMex);
+    saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '1.mat']));
      
-    [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap, mapDistribution, 1, halfWindowSize, annealing, isUseMex);
-    saveImg(depthMap, mapDistribution, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '2.mat']));
+    [orientationMap, depthMap, mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, mapDistribution, 1, halfWindowSize, annealing, isUseMex);
+    saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '2.mat']));
 %      
-    [depthMap, mapDistribution] = proporgation(img1_struct, otherImage_struct, depthMap, mapDistribution, 3, halfWindowSize, annealing, isUseMex);
-    saveImg(depthMap, mapDistribution, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '3.mat']));  
+    [orientationMap, depthMap, mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, mapDistribution, 3, halfWindowSize, annealing, isUseMex);
+    saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '3.mat']));  
 %     
     fprintf(1, 'Iteration %i is finished\n', i);
 end
@@ -91,11 +97,11 @@ save all.mat;
 end
 
 
-function saveImg(depthMap, mapDistribution, fileName)
+function saveImg(depthMap, mapDistribution, orientationMap, fileName)
 %     figure();
 %     imagesc(depthMap); axis equal;
 % if nargin == 2    
-    save(fileName, 'depthMap', 'mapDistribution');
+    save(fileName, 'depthMap', 'mapDistribution', 'orientationMap');
 % elseif nargin ==3
 %     save(fileName, 'depthMap', 'idMap');
 % end

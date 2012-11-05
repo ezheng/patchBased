@@ -1,4 +1,4 @@
-function [depthMap, mapDistribution] = LeftToRight(image1_struct, otherImage_struct, depthMap, mapDistribution, rowWidth, annealing, isUseMex)
+function [orientationMap, depthMap, mapDistribution] = LeftToRight(orientationMap, image1_struct, otherImage_struct, depthMap, mapDistribution, rowWidth, annealing, isUseMex)
 
 global far; global near; global halfWindowSize;
 % 
@@ -12,7 +12,7 @@ emptyMapDistribution = zeros(size(mapDistribution));
 
 if(isUseMex)
     tic
-    [depthMap, mapDistribution] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 0);
+    [depthMap, mapDistribution, orientationMap] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 0, orientationMap);
     toc
 else
     parfor row = 1:h
