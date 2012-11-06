@@ -4,6 +4,8 @@ global far; global near; global halfWindowSize;
 % 
 h = image1_struct.h;
 w = image1_struct.w;
+% s = RandStream('mcg16807','Seed',0);
+% RandStream.setDefaultStream(s);
 randMap = rand(h, w) * (far - near) + near;
 
 localWindowSize = halfWindowSize;

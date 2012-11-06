@@ -1,17 +1,17 @@
 function pathStereo(img1_struct, otherImage_struct, imageROI)
 
 global near; global far; global halfWindowSize; 
-near = 5;
-far = 18.0;
+near = 3;
+far = 12.0;
 % near = 0.45;
 % far = 0.70;
 isUseColor = true;
-isUseMex = true;
+isUseMex = false;
 % MATCH_METHOD = 'NCC';
 halfWindowSize = 4; 
 % depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_3sample_NoAnneal_proporgateDist_smallsigma\';
 % depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\final\';
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\herzjesu\';
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\fountain_mex\';
 %--------------------------------------------- 
 
 image1 = im2double(imread(img1_struct.imageName));
@@ -38,11 +38,13 @@ s = RandStream('mcg16807','Seed',0);
 RandStream.setDefaultStream(s);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
-orientationMap = rand(h,w,3)*2 - 1;
+% orientationMap = rand(h,w,3)*2 - 1;
+orientationMap = zeros(h,w,3);
 orientationMap(:,:,1:2) = 0; orientationMap(:,:,3) = 1.0;
 orientationMap = orientationMap ./ repmat(sqrt(sum(orientationMap.^2,3)),[1,1, size(orientationMap,3)]);
 
 % mapDistribution = ones(hh, ww, numel(otherImage_struct)) * 0.5;
+% normalize mapDistribution
 mapDistribution = rand(hh, ww, numel(otherImage_struct));
 mapDistribution = mapDistribution./ repmat(sum(mapDistribution,3), [1,1,size(mapDistribution,3)]); % normalization
 
@@ -53,18 +55,19 @@ tic;
 if(matlabpool('size') ~=0)
     matlabpool close;    
 end
-% matlabpool open 8;
-
+if(~isUseMex)
+    matlabpool open 8;
+end
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);
 end
 
-annealing = 0.0;
+
 
 addpath('C:\Enliang\cpp\patchMatch_mex\build_64\Release\');
 % addpath('C:\Enliang\cpp\patchMatch_mex\build_64\Debug\');
 for i = 1:numOfIteration
-     annealing = annealing - 0.1;
+     annealing = i;
      if(annealing <= 0) 
          annealing = 0;
      end

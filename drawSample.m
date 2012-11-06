@@ -11,7 +11,7 @@ numOfPoluplation = numel( mapDistribution);
 
 idSelected = randsample( 1:numOfPoluplation, K, true, mapDistribution);
 
-idSelected = unique(idSelected);    % need apply this to prevent from duplicated calculation
+% idSelected = unique(idSelected);    % need apply this to prevent from duplicated calculation
 
 
 

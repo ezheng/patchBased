@@ -4,10 +4,16 @@ function  [bestDepth, mapDistribution] = costCalculationGiveId(meshX, meshY, dep
     gaussianTable, annealing)
 
 % propogate distribution:
-% mapDistribution2 = mapDistribution2 * 0.5 + mapDistribution1 * 0.5;
+
+if(annealing >1)
+    mapDistribution1 = mapDistribution2 * 0.2 + mapDistribution1 * 0.8;
+    numOfSample = 3;    
+else
+    numOfSample = 1;
+end
 % mapDistribution2 = mapDistribution1;
 
-numOfSample = 5;
+
 % allCost = zeros(1,3);   % cost for 3 different depth. Only the id with best depth are used for distribution update
 
 if( size(image1_struct.imageData,3) == 1)
@@ -19,10 +25,11 @@ end
  
 % idSelected{1} = drawSample( (mapDistribution1 + mapDistribution2)*0.5, numOfSample);
 idSelected{1} = drawSample( mapDistribution1, numOfSample);
-idSelected{2} = drawSample( mapDistribution2, numOfSample);
-idSelected{3} = drawSample( mapDistribution3, numOfSample);
-idSelected{4} = drawSample( mapDistribution4, numOfSample);
-idSelected{5} = drawSample( mapDistribution5, numOfSample);
+% idSelected{1} = drawSample( mapDistribution2, numOfSample);
+% idSelected{3} = drawSample( mapDistribution3, numOfSample);
+% idSelected{4} = drawSample( mapDistribution4, numOfSample);
+% idSelected{5} = drawSample( mapDistribution5, numOfSample);
+
 % idSelected = unique([idSelected1(:); idSelected2(:)]);
 % idSelected{1} = [1 2 3 4]';
 % idSelected{2} = [1 2 3 4]';
@@ -44,7 +51,7 @@ for j = 1:3
     end
 end
 
-bestDepthID = calculateVotes(allCost, idSelected);
+% bestDepthID = calculateVotes(allCost, idSelected);
 
 % if any(allCost(:) <= -0.95)
 %    allCost % allCost reach to very high value
@@ -55,19 +62,22 @@ bestDepthID = calculateVotes(allCost, idSelected);
 % -------------------------------------------------------------------------
 % find best depth
 
-% cost = zeros(numel(idSelected), 1); maxIdx = zeros(numel(idSelected), 1);
-% [~,IA,~] = intersect(idSelected, idSelected1);
-% [cost(1), maxIdx(1)] = max(mean(allCost(idSelected{1},:),1),[], 2);    
-% [~,IA,~] = intersect(idSelected, idSelected2);
-% [cost(2), maxIdx(2)] = max(mean(allCost(idSelected{2},:),1),[], 2);
-% for i = 1:numel(idSelected)
-%     [~,IA,~] = intersect(idSelected, idSelected1);
-%     [cost(i), maxIdx(i)] = max(mean(allCost(idSelected{i},:),1),[], 2);
-% end
+%  cost = zeros(numel(idSelected), 1); maxIdx = zeros(numel(idSelected), 1);
+%  [~,IA,~] = intersect(idSelected, idSelected1);
+%  [cost(1), maxIdx(1)] = max(mean(allCost(idSelected{1},:),1),[], 2);    
+%  [~,IA,~] = intersect(idSelected, idSelected2);
+%  [cost(2), maxIdx(2)] = max(mean(allCost(idSelected{2},:),1),[], 2);
+%  for i = 1:numel(idSelected)
+%      [~,IA,~] = intersect(idSelected, idSelected1);
+%      [cost(i), maxIdx(i)] = max(mean(allCost(idSelected{i},:),1),[], 2);
+%  end
 
+% allCostWithoutNan = allCost(~any(isnan(allCost), 2), :);
 
-% [~, maxCostIdx ] = max(cost);
-% switch( maxIdx(maxCostIdx))
+allCostWithoutNan = allCost(idSelected{1},:);
+[~, bestDepthID] = max(mean(allCostWithoutNan,1), [], 2);
+%  [~, maxCostIdx ] = max(cost);
+%  switch( maxIdx(maxCostIdx))
 switch(bestDepthID)
     case 1
         bestDepth = depthData(1,1);
