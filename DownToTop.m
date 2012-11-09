@@ -12,7 +12,12 @@ emptyMapDistribution = zeros(size(mapDistribution));
 
 if(isUseMex)
     tic
-    [depthMap, mapDistribution,orientationMap] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 3, orientationMap);
+    [depthMap, mapDistribution,orientationMap] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 3, orientationMap, annealing);
+     for i = 1:size(mapDistribution, 3)
+%         mapDistribution(:,:,i) = imfilter(mapDistribution(:,:,i), myfilter);
+        
+        mapDistribution(:,:,i) = medfilt2(mapDistribution(:,:,i), [9 9]);
+    end   
     toc
 else    
     parfor col = 1:w

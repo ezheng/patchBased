@@ -2,16 +2,16 @@ function pathStereo(img1_struct, otherImage_struct, imageROI)
 
 global near; global far; global halfWindowSize; 
 near = 3;
-far = 12.0;
+far = 14.0;
 % near = 0.45;
 % far = 0.70;
 isUseColor = true;
-isUseMex = false;
+isUseMex = true;
 % MATCH_METHOD = 'NCC';
 halfWindowSize = 4; 
 % depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_3sample_NoAnneal_proporgateDist_smallsigma\';
 % depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\final\';
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\fountain_mex\';
+depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\med_filter_allimgs_9x9_noMerge\';
 %--------------------------------------------- 
 
 image1 = im2double(imread(img1_struct.imageName));
