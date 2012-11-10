@@ -35,7 +35,6 @@ end
 
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
-% orientationMap = rand(h,w,3)*2 - 1;
 orientationMap = zeros(h,w,3);
 orientationMap(:,:,1:2) = 0; orientationMap(:,:,3) = 1.0;
 orientationMap = orientationMap ./ repmat(sqrt(sum(orientationMap.^2,3)),[1,1, size(orientationMap,3)]);
@@ -82,16 +81,11 @@ t = toc;
 fprintf('use %f seconds', t);
 save all.mat;
 
-
 end
 
 
 function saveImg(depthMap, mapDistribution, orientationMap, fileName)
-%     figure();
-%     imagesc(depthMap); axis equal;
-% if nargin == 2    
+
     save(fileName, 'depthMap', 'mapDistribution', 'orientationMap');
-% elseif nargin ==3
-%     save(fileName, 'depthMap', 'idMap');
-% end
+
 end

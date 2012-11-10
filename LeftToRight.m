@@ -14,15 +14,14 @@ emptyMapDistribution = zeros(size(mapDistribution));
 
 if(isUseMex)
     tic
-    [depthMap, mapDistribution, orientationMap] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 0, orientationMap, annealing);
-    
+    [depthMap, mapDistribution, orientationMap] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 0, orientationMap, annealing);    
 %     myfilter = fspecial('gaussian', 3);
 %     myfilter = fspecial('gaussian', 5, 1.5)
-    for i = 1:size(mapDistribution, 3)
-%         mapDistribution(:,:,i) = imfilter(mapDistribution(:,:,i), myfilter);
-        
-        mapDistribution(:,:,i) = medfilt2(mapDistribution(:,:,i), [9 9]);
-    end    
+%     for i = 1:size(mapDistribution, 3)
+% %         mapDistribution(:,:,i) = imfilter(mapDistribution(:,:,i), myfilter);        
+%         mapDistribution(:,:,i) = medfilt2(mapDistribution(:,:,i), [9 9]);
+%     end  
+    mapDistribution = filterProbabilityMap(mapDistribution);
     toc
 else
     parfor row = 1:h
