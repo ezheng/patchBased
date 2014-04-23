@@ -1,6 +1,7 @@
 function main()
 
-fileName = 'C:\Enliang\MATLAB\patchBased\fountain_yilin\origImage\fountain.txt'; 
+% fileName = 'F:\Enliang\data\fountain_subregion\fountain_original_sub.txt'; 
+fileName = 'F:\Enliang\data\fountain_quartresolution\fountain_quadresolution.txt';
 image = read_middleBurry(fileName);
 
 % do stereo

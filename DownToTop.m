@@ -7,8 +7,8 @@ h = image1_struct.h;
 w = image1_struct.w;
 randMap = rand(h, w) * (far - near) + near;
 
-depthTruth = loadFLTFile('C:\Enliang\MATLAB\patchBased\fountain_yilin\fountain0004_DepthMap.flt');
- randMap = depthTruth;
+% depthTruth = loadFLTFile('C:\Enliang\MATLAB\patchBased\fountain_yilin\fountain0004_DepthMap.flt');
+%  randMap = depthTruth;
 
 localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));

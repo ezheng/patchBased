@@ -1,8 +1,8 @@
 function pathStereo(img1_struct, img2_struct)
 
 global near; global far; global halfWindowSize;
-near = 3.5;
-far = 13.5;
+near = 5;
+far = 13;
 halfWindowSize = 3; % window size is 7 by 7
 %--------------------------------------------- 
 
@@ -20,24 +20,28 @@ img2_struct.imageData = image2; [h, w, d] = size(image2); img2_struct.h = h; img
 % RandStream.setDefaultStream(s);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
-numOfIteration = 1;
+numOfIteration = 3;
 
 tic;
 if(matlabpool('size') ~=0)
     matlabpool close;    
 end
-matlabpool open;
+matlabpool open 8;
+
+
 % close all;
+
 for i = 1:numOfIteration
-%     depthMap = proporgation(img1_struct, img2_struct, depthMap, 0,5);
+    depthMap = proporgation(img1_struct, img2_struct, depthMap, 0,5);
 %     showImg(depthMap);
-%      depthMap = proporgation(img1_struct, img2_struct, depthMap, 1,5);
+     depthMap = proporgation(img1_struct, img2_struct, depthMap, 2,5);
 %      showImg(depthMap);
-%      depthMap = proporgation(img1_struct, img2_struct, depthMap, 2,5);
+     depthMap = proporgation(img1_struct, img2_struct, depthMap, 1,5);
 %      showImg(depthMap);
     depthMap = proporgation(img1_struct, img2_struct, depthMap, 3,5);
-    showImg(depthMap);
+    
 end
+showImg(depthMap);
 matlabpool close;
 t = toc;
 fprintf('use %f seconds', t);

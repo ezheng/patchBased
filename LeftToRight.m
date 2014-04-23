@@ -35,13 +35,15 @@ function oneRow = routine_LeftRight(randMap, image1_struct, image2_struct, depth
          data1 = data1(:);
 %          ------------------------
         [meshX, meshY] = meshgrid(colStart:colEnd, rowStart:rowEnd); meshX = meshX(:); meshY = meshY(:);
-        depthData = depthMap(rowStart:rowEnd, colStart:colEnd);
-        depthData = depthData(:);
-        depthData(:) = depthMap(row, col-1);
+%         depthData = depthMap(rowStart:rowEnd, colStart:colEnd);
+%         depthData = depthData(:);
+         depthData = ones( (rowEnd-rowStart+1)*(colEnd-colStart+1),1 )*depthMap(row,col-1);
+%         depthData = depthMap(row, col-1); depthData = depthData(:);
         data2 = fetchColor( meshX, meshY, depthData ,image1_struct, image2_struct );
-        cost_1 = computeZNCC(data1, data2);        
+        cost_1 = computeZNCC(data1, data2); 
+        
         %         cost of the rand map        
-        depthData = depthMap(rowStart:rowEnd, colStart:colEnd); depthData = depthData(:);  
+%         depthData = depthMap(rowStart:rowEnd, colStart:colEnd); depthData = depthData(:);  
         depthData(:) = randMap(row, col);
         data3 = fetchColor( meshX, meshY, depthData,image1_struct, image2_struct );
         cost_2 = computeZNCC(data1, data3);
