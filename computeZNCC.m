@@ -1,15 +1,7 @@
 function cost = computeZNCC(data1, data2, isUseColor)
 % r,g,b
 % global MATCH_METHOD;
-% if(all(data2 == 0))
-%     cost = -10;   
-% else
-    
-%     if( strcmp(MATCH_METHOD, 'ZNCC'))
-%         c(1) = computeZNCC_oneChannel(data1(1:dataSizePerChannel), data2(1:dataSizePerChannel));
-%         c(2) = computeZNCC_oneChannel(data1(dataSizePerChannel+1: dataSizePerChannel*2), data2(dataSizePerChannel+1: dataSizePerChannel*2));
-%         c(3) = computeZNCC_oneChannel(data1(dataSizePerChannel*2+1: dataSize), data2(dataSizePerChannel*2+1: dataSize));
-%     elseif( strcmp(MATCH_METHOD, 'NCC'))
+
     if(isUseColor)
         dataSize = numel(data1); 
         dataSizePerChannel = dataSize/3;
@@ -19,13 +11,8 @@ function cost = computeZNCC(data1, data2, isUseColor)
         c(3) = computeNCC_oneChannel(data1(dataSizePerChannel*2+1: dataSize), data2(dataSizePerChannel*2+1: dataSize));        
         cost = mean(c);
     else
-        cost = computeNCC_oneChannel(data1, data2, gaussianTable);
+        cost = computeNCC_oneChannel(data1, data2);
     end
-    
-%     else
-%         fprintf(1, 'error in choosing normalization method');
-%     end    
-% end
 end
 
 function cost = computeZNCC_oneChannel(data1, data2)
@@ -45,7 +32,8 @@ mask = find( isnan(data2) == 0);
 data1 = data1(mask);
 data2 = data2(mask);
 if(isempty(data1) || isempty(data2))
-   cost = -1; 
+%    cost = -1; 
+    cost = 0;
    return;
 end
 data1 = data1 - mean(data1);

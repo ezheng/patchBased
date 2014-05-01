@@ -5,10 +5,10 @@ near = 3;
 far = 14.0;
 % near = 0.45;
 % far = 0.70;
-isUseColor = true;
-isUseMex = true;
+isUseColor = false;
+isUseMex = false;
 % MATCH_METHOD = 'NCC';
-halfWindowSize = 4; 
+halfWindowSize = 3; 
 % depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_3sample_NoAnneal_proporgateDist_smallsigma\';
 % depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\final\';
 depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\med_filter_allimgs_9x9_noMerge\';
@@ -38,64 +38,67 @@ s = RandStream('mcg16807','Seed',0);
 RandStream.setDefaultStream(s);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
-% orientationMap = rand(h,w,3)*2 - 1;
+% given the depthMap. Compute the cost map
+
 orientationMap = zeros(h,w,3);
 orientationMap(:,:,1:2) = 0; orientationMap(:,:,3) = 1.0;
 orientationMap = orientationMap ./ repmat(sqrt(sum(orientationMap.^2,3)),[1,1, size(orientationMap,3)]);
 
 % mapDistribution = ones(hh, ww, numel(otherImage_struct)) * 0.5;
 % normalize mapDistribution
-mapDistribution = rand(hh, ww, numel(otherImage_struct));
-mapDistribution = mapDistribution./ repmat(sum(mapDistribution,3), [1,1,size(mapDistribution,3)]); % normalization
+% mapDistribution = rand(hh, ww, numel(otherImage_struct));
+% mapDistribution = mapDistribution./ repmat(sum(mapDistribution,3), [1,1,size(mapDistribution,3)]); % normalization
 
-
-numOfIteration = 1000;
-
+numOfIteration = 3;
 tic;
 if(matlabpool('size') ~=0)
     matlabpool close;    
 end
 if(~isUseMex)
-    matlabpool open 8;
+    matlabpool open 7;
 end
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);
 end
 
-
-
-addpath('C:\Enliang\cpp\patchMatch_mex\build_64\Release\');
+% addpath('C:\Enliang\cpp\patchMatch_mex\build_64\Release\');
 % addpath('C:\Enliang\cpp\patchMatch_mex\build_64\Debug\');
+
+if( ~exist('costMap.mat', 'file'))
+    costMap = costMapComputation(depthMap, img1_struct, otherImage_struct, halfWindowSize, isUseColor);
+    distributionMap = distributionMapComputation(costMap, transProb);
+%   
+else
+    load costMap.mat;
+end
+
+
 for i = 1:numOfIteration
      annealing = i;
      if(annealing <= 0) 
          annealing = 0;
      end
-%      load(fullfile(depthFileSavePath, ['loop', num2str(1), '_', '3.mat']));
-     
+%      load(fullfile(depthFileSavePath, ['loop', num2str(1), '_', '3.mat']));     
       [orientationMap, depthMap, mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap,mapDistribution, 0, halfWindowSize, annealing, isUseMex);
-      saveImg(depthMap,mapDistribution, orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']));
-     
-%      A =  rand(h,w) * (far - near) + near; % depthMap initialization;
-%      A =  rand(h,w) * (far - near) + near;
-%      load loop1_1.mat;
+%       saveImg(depthMap,mapDistribution, orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']));
+     fprintf(1, 'Iteration %i is finished\n', i);
 
     [orientationMap, depthMap,mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, mapDistribution, 2, halfWindowSize, annealing, isUseMex);
-    saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '1.mat']));
-     
+%     saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '1.mat']));
+    fprintf(1, 'Iteration %i is finished\n', i);
     [orientationMap, depthMap, mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, mapDistribution, 1, halfWindowSize, annealing, isUseMex);
-    saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '2.mat']));
+%     saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '2.mat']));
 %      
+    fprintf(1, 'Iteration %i is finished\n', i);
     [orientationMap, depthMap, mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, mapDistribution, 3, halfWindowSize, annealing, isUseMex);
-    saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '3.mat']));  
-%     
+%     saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '3.mat']));  
+     
     fprintf(1, 'Iteration %i is finished\n', i);
 end
 matlabpool close;
 t = toc;
 fprintf('use %f seconds', t);
 save all.mat;
-
 
 end
 

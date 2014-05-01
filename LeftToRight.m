@@ -12,21 +12,16 @@ localWindowSize = halfWindowSize;
 emptyMap = zeros(size(depthMap));
 emptyMapDistribution = zeros(size(mapDistribution));
 
+
+
 if(isUseMex)
-    tic
     [depthMap, mapDistribution, orientationMap] = patchMatch(image1_struct, otherImage_struct, depthMap, randMap, mapDistribution, 0, orientationMap, annealing);
-    
-%     myfilter = fspecial('gaussian', 3);
-%     myfilter = fspecial('gaussian', 5, 1.5)
-    for i = 1:size(mapDistribution, 3)
-%         mapDistribution(:,:,i) = imfilter(mapDistribution(:,:,i), myfilter);
-        
-        mapDistribution(:,:,i) = medfilt2(mapDistribution(:,:,i), [9 9]);
-    end    
-    toc
 else
-    parfor row = 1:h
-%     for row = 1:h
+%     have cost volume
+    
+%     update based on the cost
+
+    for row = 1:h
         if(row == h)
             [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row - 1,:,:), mapDistribution(row,:,:),  mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
         elseif(row == 1)
@@ -34,7 +29,6 @@ else
         else
             [emptyMap(row, :), emptyMapDistribution(row,:,:) ] = routine_LeftRight(randMap, mapDistribution(row - 1,:,:), mapDistribution(row + 1,:,:), mapDistribution(row,:,:), image1_struct, otherImage_struct, depthMap, row, localWindowSize, rowWidth, annealing);
         end
-        %     fprintf('row %d is finished\n', row);
     end
     depthMap = emptyMap;
     mapDistribution = emptyMapDistribution;
@@ -68,24 +62,30 @@ function [oneRow, mapDistribution_middle] = routine_LeftRight(randMap, mapDistri
 %         cost_2 = addBinaryCost( cost_2, depthData(1), depthMap(row, col - 1));
         depthData(:,3) = depthMap(row, col);
 % -------------------------------------------------------------------
-        mapDistribution1 = mapDistribution_middle(1, col - 1, :);  % left
-        mapDistribution1 = mapDistribution1(:); 
+%         mapDistribution1 = mapDistribution_middle(1, col - 1, :);  % left
+%         mapDistribution1 = mapDistribution1(:); 
+%         
+%         mapDistribution2 = mapDistribution_middle(1, col, :); % middle
+%         mapDistribution2 = mapDistribution2(:); 
+%         if(col == w)
+%             mapDistribution3 = mapDistribution_middle(1, col, :);
+%         else
+%             mapDistribution3 = mapDistribution_middle(1, col + 1, :); % right
+%         end
+%         mapDistribution3 = mapDistribution3(:); 
+%         
+%         
+%         mapDistribution4 = mapDistribution_low(1, col, :); %top
+%         mapDistribution4 = mapDistribution4(:);
+%         
+%         mapDistribution5 = mapDistribution_high(1, col, :);
+%         mapDistribution5 = mapDistribution5(:);
+
+
+%         % Here I should update the distribution based on the cost.
         
-        mapDistribution2 = mapDistribution_middle(1, col, :); % middle
-        mapDistribution2 = mapDistribution2(:); 
-        if(col == w)
-            mapDistribution3 = mapDistribution_middle(1, col, :);
-        else
-            mapDistribution3 = mapDistribution_middle(1, col + 1, :); % right
-        end
-        mapDistribution3 = mapDistribution3(:); 
+
         
-        
-        mapDistribution4 = mapDistribution_low(1, col, :); %top
-        mapDistribution4 = mapDistribution4(:);
-        
-        mapDistribution5 = mapDistribution_high(1, col, :);
-        mapDistribution5 = mapDistribution5(:);
 % -------------------------------------------------------------------        
         [bestDepth, oneRowDistribution] = costCalculationGiveId(meshX, meshY, depthData, image1_struct, otherImage_struct, data1,...
              mapDistribution1, mapDistribution2, mapDistribution3, mapDistribution4, mapDistribution5 , gaussianTable, annealing);
