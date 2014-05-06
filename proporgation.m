@@ -1,4 +1,4 @@
-function [orientationMap, depthMap, mapDistribution]= proporgation(orientationMap, image1_struct, image2_struct, depthMap,mapDistribution, flag, width, annealing, isUseMex)
+function [orientationMap, depthMap, costMap]= proporgation(orientationMap, image1_struct, image2_struct, depthMap,mapDistribution,costMap, flag, halfWindowSize)
 
 % flag:
 % 0    left->right
@@ -7,13 +7,13 @@ function [orientationMap, depthMap, mapDistribution]= proporgation(orientationMa
 % 3    down -> top
 switch (flag)
     case (0)
-        [orientationMap, depthMap, mapDistribution] = LeftToRight(orientationMap, image1_struct, image2_struct, depthMap, mapDistribution, width, annealing, isUseMex);
+        [orientationMap, depthMap, costMap] = LeftToRight(orientationMap, image1_struct, image2_struct, depthMap, mapDistribution,costMap, halfWindowSize);
     case (1)
-        [orientationMap, depthMap, mapDistribution] = RightToLeft(orientationMap, image1_struct, image2_struct, depthMap, mapDistribution, width, annealing, isUseMex);
+        [orientationMap, depthMap, costMap] = RightToLeft(orientationMap, image1_struct, image2_struct, depthMap, mapDistribution,costMap, halfWindowSize);
     case (2)
-        [orientationMap, depthMap, mapDistribution] = TopToDown(orientationMap, image1_struct, image2_struct, depthMap, mapDistribution, width, annealing, isUseMex);
+        [orientationMap, depthMap, costMap] = TopToDown(orientationMap, image1_struct, image2_struct, depthMap, mapDistribution,costMap, halfWindowSize);
     case (3)
-        [orientationMap, depthMap, mapDistribution] = DownToTop(orientationMap, image1_struct, image2_struct, depthMap, mapDistribution, width, annealing, isUseMex);
+        [orientationMap, depthMap, costMap] = DownToTop(orientationMap, image1_struct, image2_struct, depthMap, mapDistribution,costMap, halfWindowSize);
     otherwise
         fprintf(1, 'proporgation direction is not recognized');
 end

@@ -1,8 +1,8 @@
 function pathStereo(img1_struct, otherImage_struct, imageROI)
 
 global near; global far; global halfWindowSize; 
-near = 3;
-far = 14.0;
+near = 4;
+far = 10.0;
 % near = 0.45;
 % far = 0.70;
 isUseColor = false;
@@ -44,70 +44,59 @@ orientationMap = zeros(h,w,3);
 orientationMap(:,:,1:2) = 0; orientationMap(:,:,3) = 1.0;
 orientationMap = orientationMap ./ repmat(sqrt(sum(orientationMap.^2,3)),[1,1, size(orientationMap,3)]);
 
-% mapDistribution = ones(hh, ww, numel(otherImage_struct)) * 0.5;
-% normalize mapDistribution
-% mapDistribution = rand(hh, ww, numel(otherImage_struct));
-% mapDistribution = mapDistribution./ repmat(sum(mapDistribution,3), [1,1,size(mapDistribution,3)]); % normalization
-
 numOfIteration = 3;
 tic;
 if(matlabpool('size') ~=0)
     matlabpool close;    
 end
-if(~isUseMex)
-    matlabpool open 7;
-end
+
+matlabpool open 7;
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);
 end
 
-% addpath('C:\Enliang\cpp\patchMatch_mex\build_64\Release\');
-% addpath('C:\Enliang\cpp\patchMatch_mex\build_64\Debug\');
-
 if( ~exist('costMap.mat', 'file'))
-    costMap = costMapComputation(depthMap, img1_struct, otherImage_struct, halfWindowSize, isUseColor);
-    distributionMap = distributionMapComputation(costMap, transProb);
-%   
+    costMap = costMapComputation(depthMap, img1_struct, otherImage_struct, halfWindowSize);
+%    costMap = rand( size(depthMap,1), size(depthMap,2), numel(otherImage_struct) );
+    distributionMap = distributionMapComputation(costMap);
+    save costMap.mat; 
 else
     load costMap.mat;
 end
 
 
 for i = 1:numOfIteration
-     annealing = i;
-     if(annealing <= 0) 
-         annealing = 0;
-     end
-%      load(fullfile(depthFileSavePath, ['loop', num2str(1), '_', '3.mat']));     
-      [orientationMap, depthMap, mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap,mapDistribution, 0, halfWindowSize, annealing, isUseMex);
-%       saveImg(depthMap,mapDistribution, orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '0.mat']));
-     fprintf(1, 'Iteration %i is finished\n', i);
 
-    [orientationMap, depthMap,mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, mapDistribution, 2, halfWindowSize, annealing, isUseMex);
-%     saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '1.mat']));
+    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap,distributionMap,costMap, 0, halfWindowSize);
+    distributionMap = distributionMapComputation(costMap);
     fprintf(1, 'Iteration %i is finished\n', i);
-    [orientationMap, depthMap, mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, mapDistribution, 1, halfWindowSize, annealing, isUseMex);
-%     saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '2.mat']));
-%      
+    
+    [orientationMap, depthMap,costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, distributionMap,costMap, 2, halfWindowSize);
+    distributionMap = distributionMapComputation(costMap);
     fprintf(1, 'Iteration %i is finished\n', i);
-    [orientationMap, depthMap, mapDistribution] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, mapDistribution, 3, halfWindowSize, annealing, isUseMex);
-%     saveImg(depthMap, mapDistribution,orientationMap, fullfile(depthFileSavePath, ['loop', num2str(i), '_', '3.mat']));  
-     
+    
+    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, distributionMap,costMap, 1, halfWindowSize);
+    distributionMap = distributionMapComputation(costMap);
     fprintf(1, 'Iteration %i is finished\n', i);
+    
+    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, distributionMap,costMap, 3, halfWindowSize);
+    distributionMap = distributionMapComputation(costMap);
+    fprintf(1, 'Iteration %i is finished\n', i);
+    
 end
 matlabpool close;
 t = toc;
-fprintf('use %f seconds', t);
+fprintf('use %f seconds\n', t);
 save all.mat;
 
 end
 
 
-function saveImg(depthMap, mapDistribution, orientationMap, fileName)
+function saveImg(depthMap, distributionMap, orientationMap, fileName)
 %     figure();
 %     imagesc(depthMap); axis equal;
 % if nargin == 2    
-    save(fileName, 'depthMap', 'mapDistribution', 'orientationMap');
+    save(fileName, 'depthMap', 'distributionMap', 'orientationMap');
 % elseif nargin ==3
 %     save(fileName, 'depthMap', 'idMap');
 % end

@@ -1,18 +1,18 @@
-function costMapComputation = costMapComputation(depthMap, img1_struct, otherImage_struct, halfWindowSize, isUseColor)
+function costMapComputation = costMapComputation(depthMap, img1_struct, otherImage_struct, halfWindowSize)
 
 costMapComputation = zeros( size(depthMap,1), size(depthMap,2), numel(otherImage_struct) );
 
-    
-    parfor row = 1: size(depthMap,1)        
-        costMapComputation(row,:,:) = costMapComputation_route(row, depthMap, img1_struct, otherImage_struct, halfWindowSize, isUseColor);
-    end       
-
+tic
+parfor row = 1: size(depthMap,1)
+    costMapComputation(row,:,:) = costMapComputation_route(row, depthMap, img1_struct, otherImage_struct, halfWindowSize);
+end
+fprintf(1, 'Cost map computation time: %d seconds\n', toc);
 
 
 end
 
 
-function costColumn = costMapComputation_route(row, depthMap, image1_struct, otherImage_struct, halfWindowSize, isUseColor)
+function costColumn = costMapComputation_route(row, depthMap, image1_struct, otherImage_struct, halfWindowSize)
     [h,w] = size(depthMap);       
     costColumn = zeros(1, size(depthMap,2), numel(otherImage_struct));
     
@@ -30,7 +30,7 @@ function costColumn = costMapComputation_route(row, depthMap, image1_struct, oth
         
         for i = 1: size(costColumn,3)
             data2 = fetchColor( meshX, meshY, depthData ,image1_struct, otherImage_struct(i) );
-            costColumn(1,col,i) = computeZNCC( data1, data2, isUseColor);
+            costColumn(1,col,i) = computeZNCC( data1, data2);
         end
         
     end
