@@ -50,7 +50,7 @@ if(matlabpool('size') ~=0)
     matlabpool close;    
 end
 
-matlabpool open 7;
+% matlabpool open 4;
 if(~exist(depthFileSavePath, 'dir')) 
     mkdir(depthFileSavePath);
 end
@@ -64,24 +64,29 @@ else
     load costMap.mat;
 end
 
+backwardMap = backwardMessage_row_left2rightProp(costMap);
+backwardMap = backwardMessage_col_top2botProp(costMap);
+backwardMap = backwardMessage_row_right2leftProp(costMap);
+backwardMap = backwardMessage_col_bot2topProp(costMap);
+
 
 for i = 1:numOfIteration
-
-    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap,distributionMap,costMap, 0, halfWindowSize);
-    distributionMap = distributionMapComputation(costMap);
-    fprintf(1, 'Iteration %i is finished\n', i);
     
-    [orientationMap, depthMap,costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, distributionMap,costMap, 2, halfWindowSize);
-    distributionMap = distributionMapComputation(costMap);
-    fprintf(1, 'Iteration %i is finished\n', i);
+    backwardMap = backwardMessage_row_left2rightProp(costMap);
+    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap,backwardMap,costMap, 0, halfWindowSize);
+    fprintf(1, 'Iteration %i is finished. Left -> right \n', i);
     
-    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, distributionMap,costMap, 1, halfWindowSize);
-    distributionMap = distributionMapComputation(costMap);
-    fprintf(1, 'Iteration %i is finished\n', i);
+     backwardMap = backwardMessage_col_top2botProp(costMap);
+    [orientationMap, depthMap,costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 2, halfWindowSize);
+    fprintf(1, 'Iteration %i is finished. top -> bottom\n', i);
     
-    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, distributionMap,costMap, 3, halfWindowSize);
-    distributionMap = distributionMapComputation(costMap);
-    fprintf(1, 'Iteration %i is finished\n', i);
+     backwardMap = backwardMessage_row_right2leftProp(costMap);
+    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 1, halfWindowSize);
+    fprintf(1, 'Iteration %i is finished. right -> left\n', i);
+    
+     backwardMap = backwardMessage_col_bot2topProp(costMap);
+    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 3, halfWindowSize);
+    fprintf(1, 'Iteration %i is finished. bottom -> top\n', i);
     
 end
 matlabpool close;
