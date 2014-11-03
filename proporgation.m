@@ -15,7 +15,7 @@ switch (flag)
     case (3)
         [orientationMap, depthMap, costMap] = DownToTop(orientationMap, image1_struct, image2_struct, depthMap, mapDistribution,costMap, halfWindowSize);
     otherwise
-        fprintf(1, 'proporgation direction is not recognized');
+        error(1, 'proporgation direction is not recognized');
 end
 end
 

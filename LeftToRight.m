@@ -8,8 +8,8 @@ randMap = rand(h, w) * (far - near) + near;
 emptyMap = zeros(size(depthMap));
 tic
 fprintf(1, 'starting left to right...\n');
-% parfor row = 1:h
-for row = 1:h
+parfor row = 1:h
+% for row = 1:h
     fprintf(1, 'row: %d\n', row);
     mapDistributionOneRow = mapDistribution(row,:,:);        
     costMapOneRow = costMap(row,:,:);    
@@ -51,13 +51,14 @@ function [oneRow,updatedCost] = routine_LeftRight(randMap, mapDistributionOneRow
      emission = constant * exp( -( 1-costMapOneRow(1,1,:) ).^2/(2*sigma*sigma) ); %compute the cost of 1st variable
      emission_uniform = 0.5;
      alpha = [emission; repmat(emission_uniform,size(emission)) ]; alpha = alpha./repmat((alpha(1,:,:) + alpha(2,:,:)), 2, 1);
-%         alpha(1,1) = emission;
-%          alpha(2,1) = emission_uniform;
+%     alpha(1,1) = emission;
+%     alpha(2,1) = emission_uniform;
      
     for col = 2:w    
-%         compute alpha, and compute probability, and then update depth
-%           alpha(1,i) = emission(i) * ( alpha(1,i-1) * transitionProb(1,1) + alpha(2,i-1)*transitionProb(2,1) );
-%             alpha(2,i) = emission_uniform * ( alpha(1,i-1) * transitionProb(1,2) + alpha(2,i-1)*transitionProb(2,2) );
+%       compute alpha, and compute probability, and then update depth
+%       alpha(1,i) = emission(i) * ( alpha(1,i-1) * transitionProb(1,1) + alpha(2,i-1)*transitionProb(2,1) );
+%       alpha(2,i) = emission_uniform * ( alpha(1,i-1) * transitionProb(1,2) + alpha(2,i-1)*transitionProb(2,2) );
+
         emission = constant * exp( -( 1-costMapOneRow(:,col,:) ).^2/(2*sigma*sigma) );
         alpha_new = [emission .* (alpha(1,:,:) * transitionProb(1,1) + alpha(2,:,:) * transitionProb(2,1));...
             emission_uniform .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];

@@ -7,7 +7,6 @@ mask = find( isnan(data2) == 0);
 data1 = data1(mask);
 data2 = data2(mask);
 if(isempty(data1) || isempty(data2))
-    %    cost = -1;
     cost = 0;
     return;
 end

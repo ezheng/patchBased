@@ -11,4 +11,4 @@ image = read_middleBurry(fileName, imageROI);
 % pathStereo(image(7), image([1:6, 8:end]), imageROI);
 % pathStereo(image(2), image([1,3:end]), imageROI);
 
-pathStereo(image(1), image([2:end]), imageROI);
+pathStereo(image(1), image(2:end), imageROI);

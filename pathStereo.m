@@ -1,18 +1,25 @@
 function pathStereo(img1_struct, otherImage_struct, imageROI)
 
 global near; global far; global halfWindowSize; 
-near = 4;
+near = 3;
 far = 10.0;
 % near = 0.45;
 % far = 0.70;
+isUseMultipleCore = false;
+numWorkers = 6;
+sigma = 0.45;
+prob = 0.9999;
 isUseColor = false;
 isUseMex = false;
 % MATCH_METHOD = 'NCC';
 halfWindowSize = 3; 
 % depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_3sample_NoAnneal_proporgateDist_smallsigma\';
 % depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\final\';
-depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\med_filter_allimgs_9x9_noMerge\';
-%--------------------------------------------- 
+depthFileSavePath = 'C:\Enliang\matlab\patchBased\';
+% --------------------------------------------- 
+if(~exist(depthFileSavePath, 'dir')) 
+    mkdir(depthFileSavePath);
+end
 
 image1 = im2double(imread(img1_struct.imageName));
 image1 = getROI(image1, imageROI);
@@ -25,7 +32,6 @@ for i = 1:numel(otherImage_struct)
     image2 = convertColor(image2, isUseColor);
     otherImage_struct(i).imageData = image2; 
     [hh, ww, dd] = size(image2); otherImage_struct(i).h = hh; otherImage_struct(i).w = ww; otherImage_struct(i).d = dd;
-%     assign a random id map for each image   
 end
 % ------------ verify camera poses
 %   F = fundfromcameras(img1_struct.K * [img1_struct.R, img1_struct.T], otherImage_struct(1).K * [otherImage_struct(1).R, otherImage_struct(1).T]);
@@ -34,57 +40,52 @@ end
 % fig=vgg_gui_F(uint8(img1_struct.imageData), uint8(otherImage_struct(2).imageData),F);
 
 % ------------l
-s = RandStream('mcg16807','Seed',0);
-RandStream.setDefaultStream(s);
+% s = RandStream('mcg16807','Seed',0);
+% RandStream.setDefaultStream(s);
+rng(0);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
-% given the depthMap. Compute the cost map
 
+% orientation map is not used in this version of program
 orientationMap = zeros(h,w,3);
 orientationMap(:,:,1:2) = 0; orientationMap(:,:,3) = 1.0;
-orientationMap = orientationMap ./ repmat(sqrt(sum(orientationMap.^2,3)),[1,1, size(orientationMap,3)]);
+orientationMap = orientationMap ./ repmat(sqrt(sum(orientationMap.^2,3)),[1,1, size(orientationMap,3)]);  % normalize orientation
 
 numOfIteration = 3;
 tic;
-if(matlabpool('size') ~=0)
-    matlabpool close;    
-end
 
-% matlabpool open 4;
-if(~exist(depthFileSavePath, 'dir')) 
-    mkdir(depthFileSavePath);
-end
+setMultiThreadContext(isUseMultipleCore, numWorkers);
 
-if( ~exist('costMap.mat', 'file'))
+if( ~exist('costMap.mat', 'file') )
     costMap = costMapComputation(depthMap, img1_struct, otherImage_struct, halfWindowSize);
-%    costMap = rand( size(depthMap,1), size(depthMap,2), numel(otherImage_struct) );
+%   costMap = rand( size(depthMap,1), size(depthMap,2), numel(otherImage_struct) );
     distributionMap = distributionMapComputation(costMap);
-    save costMap.mat; 
+    save costMap.mat costMap distributionMap; 
 else
     load costMap.mat;
 end
 
-backwardMap = backwardMessage_row_left2rightProp(costMap);
-backwardMap = backwardMessage_col_top2botProp(costMap);
-backwardMap = backwardMessage_row_right2leftProp(costMap);
-backwardMap = backwardMessage_col_bot2topProp(costMap);
+% backwardMap = backwardMessage_row_left2rightProp(costMap);
+% backwardMap = backwardMessage_col_top2botProp(costMap);
+% backwardMap = backwardMessage_row_right2leftProp(costMap);
+% backwardMap = backwardMessage_col_bot2topProp(costMap);
 
 
 for i = 1:numOfIteration
     
-    backwardMap = backwardMessage_row_left2rightProp(costMap);
+    backwardMap = backwardMessage_row_left2rightProp(costMap, sigma, prob);
     [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap,backwardMap,costMap, 0, halfWindowSize);
     fprintf(1, 'Iteration %i is finished. Left -> right \n', i);
     
-     backwardMap = backwardMessage_col_top2botProp(costMap);
+     backwardMap = backwardMessage_col_top2botProp(costMap, sigma, prob);
     [orientationMap, depthMap,costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 2, halfWindowSize);
     fprintf(1, 'Iteration %i is finished. top -> bottom\n', i);
     
-     backwardMap = backwardMessage_row_right2leftProp(costMap);
+     backwardMap = backwardMessage_row_right2leftProp(costMap, sigma, prob);
     [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 1, halfWindowSize);
     fprintf(1, 'Iteration %i is finished. right -> left\n', i);
     
-     backwardMap = backwardMessage_col_bot2topProp(costMap);
+     backwardMap = backwardMessage_col_bot2topProp(costMap, sigma, prob);
     [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 3, halfWindowSize);
     fprintf(1, 'Iteration %i is finished. bottom -> top\n', i);
     

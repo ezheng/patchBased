@@ -1,26 +1,23 @@
-function backwardMap = backwardMessage_row_right2leftProp(costMap)
+function backwardMap = backwardMessage_row_right2leftProp(costMap, sigma, prob)
 
 backwardMap = zeros( size(costMap) );
 
-% for row = 1: size(costMap,1)
-sigma = 0.45;
 tic
-% parfor row = 1: size(costMap,1)
-for row = 1: size(costMap,1)
-%     fprintf(1, 'row: %d\n', row);
-    backwardMap(row,:,:) = distributionMapComputation_route(costMap, row, sigma);
+parfor row = 1: size(costMap,1)
+    backwardMap(row,:,:) = distributionMapComputation_route(costMap, row, sigma, prob);
 end
 fprintf(1, 'SPM computation time: %d seconds\n', toc);
 end
 
 
-function distributionMapARow = distributionMapComputation_route(costMap, row, sigma)
+function distributionMapARow = distributionMapComputation_route(costMap, row, sigma, prob)
 
     [~, width, numOfSourceImages] = size(costMap);
     distributionMapARow = zeros(1, width, numOfSourceImages);    
         
     constant = 2/sqrt(2*pi)/sigma/ erf(sqrt(2)/sigma);
-    transitionProb = [0.9999,0.0001; 0.0001, 0.9999];
+%     transitionProb = [0.9999,0.0001; 0.0001, 0.9999];
+     transitionProb = [prob,1-prob; 1-prob, prob];
 %   emission prob?, compute based on the cost function?
     
     for imageIdx = 1:numOfSourceImages

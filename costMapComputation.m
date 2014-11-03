@@ -1,5 +1,5 @@
 function costMapComputation = costMapComputation(depthMap, img1_struct, otherImage_struct, halfWindowSize)
-
+% This computes the cost from left to right
 costMapComputation = zeros( size(depthMap,1), size(depthMap,2), numel(otherImage_struct) );
 
 tic

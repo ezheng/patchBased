@@ -1,31 +1,30 @@
-function backwardMap = backwardMessage_col_top2botProp(costMap)
+function backwardMap = backwardMessage_col_top2botProp(costMap, sigma, prob)
 
 backwardMap = zeros( size(costMap) );
 
 % for row = 1: size(costMap,1)
-sigma = 0.45;
+% sigma = 0.45;
 tic
-% parfor row = 1: size(costMap,1)
-for col = 1: size(costMap,2)
-%     fprintf(1, 'row: %d\n', row);
-    backwardMap(:,col,:) = distributionMapComputation_route(costMap, col, sigma);
+parfor col = 1: size(costMap,2)
+    backwardMap(:,col,:) = distributionMapComputation_route(costMap, col, sigma, prob);
 end
 fprintf(1, 'SPM computation time: %d seconds\n', toc);
 end
 
 
-function distributionMapACol = distributionMapComputation_route(costMap, col, sigma)
+function distributionMapACol = distributionMapComputation_route(costMap, col, sigma,prob)
 
     [height, ~, numOfSourceImages] = size(costMap);
     distributionMapACol = zeros(height, 1, numOfSourceImages);    
         
     constant = 2/sqrt(2*pi)/sigma/ erf(sqrt(2)/sigma);
-    transitionProb = [0.9999,0.0001; 0.0001, 0.9999];
+     transitionProb = [prob,1-prob; 1-prob, prob];
+%     transitionProb = [0.9999,0.0001; 0.0001, 0.9999];
 %   emission prob?, compute based on the cost function?
     
     for imageIdx = 1:numOfSourceImages
 %         compute emission
-        emission = constant * exp( -( 1-costMap(:,col,imageIdx) ).^2/(2*sigma*sigma) );      % note teh 1-NCC here. 
+        emission = constant * exp( -( 1-costMap(:,col,imageIdx) ).^2/(2*sigma*sigma) );      % note the 1-NCC here. 
         emission_uniform = 0.5;
         
 %       compute backward message
