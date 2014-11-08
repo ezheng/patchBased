@@ -1,20 +1,17 @@
 function pathStereo(img1_struct, otherImage_struct, imageROI)
 
 global near; global far; global halfWindowSize; 
-near = 3;
+near = 5;
 far = 10.0;
 % near = 0.45;
 % far = 0.70;
-isUseMultipleCore = false;
+isUseMultipleCore = true;
 numWorkers = 6;
 sigma = 0.45;
 prob = 0.9999;
 isUseColor = false;
 isUseMex = false;
-% MATCH_METHOD = 'NCC';
 halfWindowSize = 3; 
-% depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\saveDepthFile_ltrb_multipleView_newProb_fountain_1_2to5_cleverDepthSel_3sample_NoAnneal_proporgateDist_smallsigma\';
-% depthFileSavePath = 'C:\Enliang\MATLAB\patchBased3\patchBased\final\';
 depthFileSavePath = 'C:\Enliang\matlab\patchBased\';
 % --------------------------------------------- 
 if(~exist(depthFileSavePath, 'dir')) 
@@ -65,12 +62,6 @@ else
     load costMap.mat;
 end
 
-% backwardMap = backwardMessage_row_left2rightProp(costMap);
-% backwardMap = backwardMessage_col_top2botProp(costMap);
-% backwardMap = backwardMessage_row_right2leftProp(costMap);
-% backwardMap = backwardMessage_col_bot2topProp(costMap);
-
-
 for i = 1:numOfIteration
     
     backwardMap = backwardMessage_row_left2rightProp(costMap, sigma, prob);
@@ -90,7 +81,7 @@ for i = 1:numOfIteration
     fprintf(1, 'Iteration %i is finished. bottom -> top\n', i);
     
 end
-matlabpool close;
+
 t = toc;
 fprintf('use %f seconds\n', t);
 save all.mat;

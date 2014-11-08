@@ -8,7 +8,7 @@ randMap = rand(h, w) * (far - near) + near;
 emptyMap = zeros(size(depthMap));
 tic
 fprintf(1,'starting right to left...\n');
-% for row = 1:h
+
 parfor row = 1:h
     fprintf(1, 'row: %d\n', row);
     mapDistributionOneRow = mapDistribution(row,:,:); 

@@ -8,8 +8,8 @@ randMap = rand(h, w) * (far - near) + near;
 emptyMap = zeros(size(depthMap));
 tic
 fprintf(1, 'starting top to down...\n');
+
 parfor col = 1:w    
-% for col = 1:w    
     fprintf(1, 'col: %d\n', col);
     mapDistributionOneCol = mapDistribution(:,col,:);
      costMapOneCol = costMap(:,col,:);  

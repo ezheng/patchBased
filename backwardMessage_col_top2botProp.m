@@ -38,8 +38,22 @@ function distributionMapACol = distributionMapComputation_route(costMap, col, si
             beta(i,1) = beta(i,1)/Z;
             beta(i,2) = beta(i,2)/Z;
         end       
+        
+%       compute forward message
+         alpha = zeros(height, 2 );
+        alpha(1,1) = emission(1);
+        alpha(1,2) = emission_uniform;
+        for i = 2:height
+            alpha(i,1) = emission(i) * ( alpha(i-1,1) * transitionProb(1,1) + alpha(i-1,2)*transitionProb(2,1) );
+            alpha(i,2) = emission_uniform * ( alpha(i-1,1) * transitionProb(1,2) + alpha(i-1,2)*transitionProb(2,2) );
+            Z = ( alpha(i,1) + alpha(i,2) );
+            alpha(i,1) = alpha(i,1)/Z;
+            alpha(i,2) = alpha(i,2)/Z;            
+        end        
+        alpha = alpha.*beta;        
+        distributionMapACol(:,1,imageIdx) = alpha(:,1)./( alpha(:,1) + alpha(:,2) );
 
-        distributionMapACol(:, 1, imageIdx) = beta(:,1);
+%         distributionMapACol(:, 1, imageIdx) = beta(:,1);
     end
     
 end
