@@ -1,6 +1,5 @@
-function [orientationMap, depthMap, costMap] = DownToTop(orientationMap, image1_struct, otherImage_struct, depthMap,mapDistribution,  costMap, halfWindowSize)
+function [orientationMap, depthMap, costMap] = DownToTop(orientationMap, image1_struct, otherImage_struct, depthMap,mapDistribution,  costMap, halfWindowSize, near, far)
 
-global far; global near; 
 h = image1_struct.h;
 w = image1_struct.w;
 randMap = rand(h, w) * (far - near) + near;
@@ -9,7 +8,7 @@ emptyMap = zeros(size(depthMap));
 tic
 fprintf(1, 'starting down to top...\n');
 parfor col = 1:w
-    fprintf(1, 'col: %d\n', col);
+  %  fprintf(1, 'col: %d\n', col);
     mapDistributionOneCol = mapDistribution(:,col,:);
     costMapOneCol = costMap(:,col,:);
     [emptyMap(:, col), updateCost] = routine_DownTop(randMap, mapDistributionOneCol, costMapOneCol, image1_struct, otherImage_struct, depthMap, col, halfWindowSize);

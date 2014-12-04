@@ -19,8 +19,7 @@ function distributionMapACol = distributionMapComputation_route(costMap, col, si
         
     constant = 2/sqrt(2*pi)/sigma/ erf(sqrt(2)/sigma);
      transitionProb = [prob,1-prob; 1-prob, prob];
-%     transitionProb = [0.9999,0.0001; 0.0001, 0.9999];
-%   emission prob?, compute based on the cost function?
+
     
     for imageIdx = 1:numOfSourceImages
 %         compute emission

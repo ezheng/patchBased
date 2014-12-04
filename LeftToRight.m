@@ -1,6 +1,5 @@
-function [orientationMap, depthMap, costMap] = LeftToRight(orientationMap, image1_struct, otherImage_struct, depthMap, mapDistribution, costMap, halfWindowSize)
+function [orientationMap, depthMap, costMap] = LeftToRight(orientationMap, image1_struct, otherImage_struct, depthMap, mapDistribution, costMap, halfWindowSize, near, far)
 
-global far; global near;
 h = image1_struct.h;
 w = image1_struct.w;
 randMap = rand(h, w) * (far - near) + near;
@@ -10,7 +9,7 @@ tic
 fprintf(1, 'starting left to right...\n');
 parfor row = 1:h
 % for row = 1:h
-    fprintf(1, 'row: %d\n', row);
+%     fprintf(1, 'row: %d\n', row);
     mapDistributionOneRow = mapDistribution(row,:,:);        
     costMapOneRow = costMap(row,:,:);    
     [emptyMap(row, :), updatedCost]=routine_LeftRight(randMap, mapDistributionOneRow, costMapOneRow, image1_struct, otherImage_struct, depthMap, row, halfWindowSize);    

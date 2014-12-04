@@ -45,8 +45,7 @@ function distributionMapARow = distributionMapComputation_route(costMap, row, si
             Z = ( alpha(1,i) + alpha(2,i) );
             alpha(1,i) = alpha(1,i)/Z;
             alpha(2,i) = alpha(2,i)/Z;
-        end       
-        
+        end               
         alpha = alpha.*beta;        
         distributionMapARow(1,:,imageIdx) = alpha(1,:)./( alpha(1,:) + alpha(2,:) );
 

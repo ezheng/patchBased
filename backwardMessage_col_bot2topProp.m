@@ -26,16 +26,6 @@ function distributionMapACol = distributionMapComputation_route(costMap, col, si
         emission_uniform = 0.5;
         
 %       compute backward message
-%         beta = zeros(height, 2);
-%         beta(end, 1:2) = 0.5;            
-%         for i = height - 1: -1 : 1
-%            beta(i,1) = beta(i+1,1) * emission(i+1) * transitionProb(1,1) + beta(i+1,2)*emission_uniform * transitionProb(1,2); 
-%            beta(i,2) = beta(i+1,1) * emission(i+1) * transitionProb(2,1) + beta(i+1,2)*emission_uniform * transitionProb(2,2);
-%             Z = beta(i,1) + beta(i,2);
-%             beta(i,1) = beta(i,1)/Z;
-%             beta(i,2) = beta(i,2)/Z;
-%         end       
-
         beta = zeros(height,2);
         beta(1,1:2) = 0.5;
         for i = 2:1:height
@@ -47,7 +37,7 @@ function distributionMapACol = distributionMapComputation_route(costMap, col, si
         end
         
 %        compute forward message 
-         alpha = zeros( height,2 );
+        alpha = zeros( height,2 );
         alpha(height, 1) = emission(height);
         alpha(height, 2) = emission_uniform;
         for i = height-1 : -1 : 1
@@ -59,9 +49,8 @@ function distributionMapACol = distributionMapComputation_route(costMap, col, si
         end        
         alpha = alpha.*beta;        
         distributionMapACol(:,1,imageIdx) = alpha(:,1)./( alpha(:,1) + alpha(:,2) );
-
-%         distributionMapACol(:, 1, imageIdx) = beta(:,1);
-    end
-    
+%       distributionMapACol(:, 1, imageIdx) = beta(:,1);
+        
+    end    
 end
 
