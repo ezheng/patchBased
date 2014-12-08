@@ -7,9 +7,9 @@ far = 10.0;
 isUseMultipleCore = true;
 numWorkers = 6;
 sigma = 0.45;
-prob = 0.999999;
-isUseColor = false;
-numOfIteration = 5;
+prob = 0.99999;
+isUseColor = true;
+numOfIteration = 3;
 halfWindowSize = 3; 
 depthFileSavePath = 'C:\Enliang\matlab\patchBased\';
 % --------------------------------------------- 
@@ -44,9 +44,9 @@ setMultiThreadContext(isUseMultipleCore, numWorkers);
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
 
 % orientation map is not used in this version of program
-orientationMap = zeros(h,w,3);
-orientationMap(:,:,1:2) = 0; orientationMap(:,:,3) = 1.0;
-orientationMap = orientationMap ./ repmat(sqrt(sum(orientationMap.^2,3)),[1,1, size(orientationMap,3)]);  % normalize orientation
+% orientationMap = zeros(h,w,3);
+% orientationMap(:,:,1:2) = 0; orientationMap(:,:,3) = 1.0;
+% orientationMap = orientationMap ./ repmat(sqrt(sum(orientationMap.^2,3)),[1,1, size(orientationMap,3)]);  % normalize orientation
 
 tic;
 if( ~exist('costMap.mat', 'file') )
@@ -61,27 +61,27 @@ end
 for i = 1:numOfIteration
     
     backwardMap = backwardMessage_row_left2rightProp(costMap, sigma, prob);
-    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap,backwardMap,costMap, 0, halfWindowSize, near, far);
+    [ depthMap, costMap] = proporgation( img1_struct, otherImage_struct, depthMap,backwardMap,costMap, 0, halfWindowSize, near, far,sigma,prob);
     fprintf(1, 'Iteration %i is finished. Left -> right \n', i);
-%     figure(); imagesc(depthMap); axis equal;
-    
-
+    figure(); imagesc(depthMap); axis equal;
+     
+ 
     backwardMap = backwardMessage_col_top2botProp(costMap, sigma, prob);
-    [orientationMap, depthMap,costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 2, halfWindowSize, near, far);
+    [ depthMap,costMap] = proporgation( img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 2, halfWindowSize, near, far,sigma,prob);
     fprintf(1, 'Iteration %i is finished. top -> bottom\n', i);
-%     figure(); imagesc(depthMap); axis equal;
+    figure(); imagesc(depthMap); axis equal;
 
 
     backwardMap = backwardMessage_row_right2leftProp(costMap, sigma, prob);
-    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 1, halfWindowSize, near, far);
+    [ depthMap, costMap] = proporgation( img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 1, halfWindowSize, near, far,sigma,prob);
     fprintf(1, 'Iteration %i is finished. right -> left\n', i);
-%     figure(); imagesc(depthMap); axis equal;
+    figure(); imagesc(depthMap); axis equal;
 
 
     backwardMap = backwardMessage_col_bot2topProp(costMap, sigma, prob);
-    [orientationMap, depthMap, costMap] = proporgation(orientationMap, img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 3, halfWindowSize, near, far);
+    [ depthMap, costMap] = proporgation( img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 3, halfWindowSize, near, far,sigma,prob);
     fprintf(1, 'Iteration %i is finished. bottom -> top\n', i);
-%     figure(); imagesc(depthMap); axis equal;
+    figure(); imagesc(depthMap); axis equal;
     
 end
 

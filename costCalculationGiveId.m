@@ -3,7 +3,7 @@ function  [bestDepth,costWithBestDepth] = costCalculationGiveId(costMap, meshX, 
     image1_struct, otherImage_struct, data1, mapDistribution)
 
 % propogate distribution:
-numOfSample = 6;
+numOfSample = 10;
 
 idSelected = drawSample( mapDistribution, numOfSample);
 
@@ -24,7 +24,7 @@ bestDepth = depthData(1, bestDepthID);
 
 testedId = find(~isnan(allCost(:,3)));
 costMap = costMap(:);
-assert(all( abs(allCost(testedId,3) - costMap(testedId)) < 0.00000000001 ));
+assert(all( abs(allCost(testedId,3) - costMap(testedId)) < 0.0000000001 ));
 
 costWithBestDepth = allCost(:, bestDepthID);
 nonTestedId = find(isnan(costWithBestDepth));

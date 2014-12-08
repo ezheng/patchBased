@@ -36,20 +36,20 @@ function distributionMapARow = distributionMapComputation_route(costMap, row, si
         end     
         
 %       compute forward message
-        alpha = zeros( 2,width );
-        alpha(1,1) = emission(1);
-        alpha(2,1) = emission_uniform;
-        for i = 2:width
-            alpha(1,i) = emission(i) * ( alpha(1,i-1) * transitionProb(1,1) + alpha(2,i-1)*transitionProb(2,1) );
-            alpha(2,i) = emission_uniform * ( alpha(1,i-1) * transitionProb(1,2) + alpha(2,i-1)*transitionProb(2,2) );
-            Z = ( alpha(1,i) + alpha(2,i) );
-            alpha(1,i) = alpha(1,i)/Z;
-            alpha(2,i) = alpha(2,i)/Z;          
-        end
-        alpha = alpha.*beta;        
-        distributionMapARow(1,:,imageIdx) = alpha(1,:)./( alpha(1,:) + alpha(2,:) );
+%         alpha = zeros( 2,width );
+%         alpha(1,1) = emission(1);
+%         alpha(2,1) = emission_uniform;
+%         for i = 2:width
+%             alpha(1,i) = emission(i) * ( alpha(1,i-1) * transitionProb(1,1) + alpha(2,i-1)*transitionProb(2,1) );
+%             alpha(2,i) = emission_uniform * ( alpha(1,i-1) * transitionProb(1,2) + alpha(2,i-1)*transitionProb(2,2) );
+%             Z = ( alpha(1,i) + alpha(2,i) );
+%             alpha(1,i) = alpha(1,i)/Z;
+%             alpha(2,i) = alpha(2,i)/Z;          
+%         end
+%         alpha = alpha.*beta;        
+%         distributionMapARow(1,:,imageIdx) = alpha(1,:)./( alpha(1,:) + alpha(2,:) );
         
-%         distributionMapARow(1, :, imageIdx) = beta(1,:);
+        distributionMapARow(1, :, imageIdx) = beta(1,:);
         
     end    
 end

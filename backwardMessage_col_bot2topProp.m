@@ -37,19 +37,19 @@ function distributionMapACol = distributionMapComputation_route(costMap, col, si
         end
         
 %        compute forward message 
-        alpha = zeros( height,2 );
-        alpha(height, 1) = emission(height);
-        alpha(height, 2) = emission_uniform;
-        for i = height-1 : -1 : 1
-            alpha(i,1) = emission(i) * ( alpha(i+1,1) * transitionProb(1,1) + alpha(i+1,2)*transitionProb(2,1) );
-            alpha(i,2) = emission_uniform * ( alpha(i+1,1) * transitionProb(1,2) + alpha(i+1,2)*transitionProb(2,2) );
-            Z = ( alpha(i,1) + alpha(i,2) );
-            alpha(i,1) = alpha(i,1)/Z;
-            alpha(i,2) = alpha(i,2)/Z;
-        end        
-        alpha = alpha.*beta;        
-        distributionMapACol(:,1,imageIdx) = alpha(:,1)./( alpha(:,1) + alpha(:,2) );
-%       distributionMapACol(:, 1, imageIdx) = beta(:,1);
+%         alpha = zeros( height,2 );
+%         alpha(height, 1) = emission(height);
+%         alpha(height, 2) = emission_uniform;
+%         for i = height-1 : -1 : 1
+%             alpha(i,1) = emission(i) * ( alpha(i+1,1) * transitionProb(1,1) + alpha(i+1,2)*transitionProb(2,1) );
+%             alpha(i,2) = emission_uniform * ( alpha(i+1,1) * transitionProb(1,2) + alpha(i+1,2)*transitionProb(2,2) );
+%             Z = ( alpha(i,1) + alpha(i,2) );
+%             alpha(i,1) = alpha(i,1)/Z;
+%             alpha(i,2) = alpha(i,2)/Z;
+%         end        
+%         alpha = alpha.*beta;        
+%         distributionMapACol(:,1,imageIdx) = alpha(:,1)./( alpha(:,1) + alpha(:,2) );
+      distributionMapACol(:, 1, imageIdx) = beta(:,1);
         
     end    
 end
