@@ -3,7 +3,8 @@ function main()
 % fileName = 'f:\Enliang\MATLAB\patchBased\fountain_yilin\origImage\fountain.txt'; 
 %  imageROI = [1200, 300, 1800, 800];
 % fileName = 'C:\Enliang\data\fountain_subregion\fountain_original_sub.txt';
-fileName = 'F:\Enliang\data\fountain_subregion\fountain_original_sub.txt';
+% fileName = 'F:\Enliang\data\fountain_subregion\fountain_original_sub.txt';
+fileName = 'fountain_subregion\fountain_original_sub.txt';
 
 imageROI = [];
 image = read_middleBurry(fileName, imageROI);

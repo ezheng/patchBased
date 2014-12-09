@@ -2,12 +2,11 @@ function pathStereo(img1_struct, otherImage_struct, imageROI)
 
 near = 5.0;
 far = 10.0;
-% near = 0.45;
-% far = 0.70;
-isUseMultipleCore = true;
-numWorkers = 6;
+
+isUseMultipleCore = false;
+numWorkers = 48;    % number of threads used
 sigma = 0.45;
-prob = 0.99999;
+prob = 0.9999999;
 isUseColor = true;
 numOfIteration = 3;
 halfWindowSize = 3; 
@@ -38,7 +37,7 @@ end
 % s = RandStream('mcg16807','Seed',0);
 % RandStream.setDefaultStream(s);
 
-rng(0);
+rng(1);
 setMultiThreadContext(isUseMultipleCore, numWorkers);
 
 depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
@@ -51,8 +50,6 @@ depthMap = rand(h,w) * (far - near) + near; % depthMap initialization
 tic;
 if( ~exist('costMap.mat', 'file') )
     costMap = costMapComputation(depthMap, img1_struct, otherImage_struct, halfWindowSize);
-%   costMap = rand( size(depthMap,1), size(depthMap,2), numel(otherImage_struct) );
-%   distributionMap = distributionMapComputation(costMap);
     save costMap.mat costMap; % distributionMap; 
 else
     load costMap.mat;
@@ -87,7 +84,7 @@ end
 
 t = toc;
 fprintf('use %f seconds\n', t);
-save all.mat;
+save(fullfile(depthFileSavePath, 'all.mat'));
 
 end
 

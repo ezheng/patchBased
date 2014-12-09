@@ -14,7 +14,7 @@ function distributionMapARow = distributionMapComputation_route(costMap, row, si
 
     [~, width, numOfSourceImages] = size(costMap);
     distributionMapARow = zeros(1, width, numOfSourceImages);    
-        
+%          constNorm = 1 / sqrt(2 * 3.14159265358f)/sqrt(SPMAlphaSquare)  / ( 0.5 * erff( 2.0f /sqrt(SPMAlphaSquare)/1.414213562) );
     constant = 2/sqrt(2*pi)/sigma/ erf(sqrt(2)/sigma);
     transitionProb = [prob,1-prob; 1-prob, prob];
 %   emission prob?, compute based on the cost function?
