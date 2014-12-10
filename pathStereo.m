@@ -3,11 +3,11 @@ function pathStereo(img1_struct, otherImage_struct, imageROI)
 near = 5.0;
 far = 10.0;
 
-isUseMultipleCore = false;
+isUseMultipleCore = true;
 numWorkers = 48;    % number of threads used
 sigma = 0.45;
-prob = 0.9999999;
-isUseColor = true;
+prob = 0.99999;
+isUseColor = false; % this has to be false
 numOfIteration = 3;
 halfWindowSize = 3; 
 depthFileSavePath = 'C:\Enliang\matlab\patchBased\';
