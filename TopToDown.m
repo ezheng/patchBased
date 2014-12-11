@@ -1,4 +1,4 @@
-function [ depthMap, costMap] = TopToDown( image1_struct, otherImage_struct, depthMap, mapDistribution, costMap, halfWindowSize, near, far,sigma,prob)
+function [ depthMap, costMap] = TopToDown( image1_struct, otherImage_struct, depthMap, mapDistribution, costMap, halfWindowSize, near, far,sigma,prob,NCCDistribution)
 
 h = image1_struct.h;
 w = image1_struct.w;
@@ -12,7 +12,7 @@ parfor col = 1:w
    % fprintf(1, 'col: %d\n', col);
     mapDistributionOneCol = mapDistribution(:,col,:);
      costMapOneCol = costMap(:,col,:);  
-    [emptyMap(:, col), costMap(:,col,:)] = routine_TopDown(randMap, mapDistributionOneCol, costMapOneCol, image1_struct, otherImage_struct, depthMap, col, halfWindowSize,sigma,prob);
+    [emptyMap(:, col), costMap(:,col,:)] = routine_TopDown(randMap, mapDistributionOneCol, costMapOneCol, image1_struct, otherImage_struct, depthMap, col, halfWindowSize,sigma,prob,NCCDistribution);
 end
 fprintf(1, 'elapsed time is %f', toc);
 depthMap = emptyMap;
@@ -23,7 +23,7 @@ end
 %  to update the depth, and then update the forward message. compute the
 %  probability, 
 
-function [oneCol, costMapOneCol] = routine_TopDown(randMap, mapDistributionOneCol, costMapOneCol, image1_struct, otherImage_struct, depthMap, col, halfWindowSize,sigma,prob)
+function [oneCol, costMapOneCol] = routine_TopDown(randMap, mapDistributionOneCol, costMapOneCol, image1_struct, otherImage_struct, depthMap, col, halfWindowSize,sigma,prob,NCCDistribution)
     [h,w,~] = size(image1_struct.imageData);
     numOfSourceImgs = numel(otherImage_struct);
 %     updatedCost = zeros(h, 1, numOfSourceImgs);
@@ -32,15 +32,18 @@ function [oneCol, costMapOneCol] = routine_TopDown(randMap, mapDistributionOneCo
     constant = 2/sqrt(2*pi)/sigma/ erf(sqrt(2)/sigma);
     transitionProb = [prob,1-prob; 1-prob, prob];
     emission = constant * exp( -( 1-costMapOneCol(1,1,:) ).^2/(2*sigma*sigma) ); %compute the cost of 1st variable
-    emission_uniform = 0.5;
-     alpha = [emission; repmat(emission_uniform,size(emission)) ]; alpha = alpha./repmat((alpha(1,:,:) + alpha(2,:,:)), 2, 1);
+%     emission_uniform = 0.5;
+     numOfBins = numel(NCCDistribution)-2;    
+     emission_uniform = NCCDistribution(floor((1 - costMapOneCol)/ (2/numOfBins))+2);
+ 
+     alpha = [emission; emission_uniform(1,:,:)]; alpha = alpha./repmat((alpha(1,:,:) + alpha(2,:,:)), 2, 1);
 
     for row = 2:h   
 %       compute alpha, and compute probability, and then update depth
         
         emission = constant * exp( -( 1-costMapOneCol(row,1,:) ).^2/(2*sigma*sigma) );
         alpha_new = [emission .* (alpha(1,:,:) * transitionProb(1,1) + alpha(2,:,:) * transitionProb(2,1));...
-            emission_uniform .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
+            emission_uniform(row,1,:) .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
         alpha_new = alpha_new./ repmat((alpha_new(1,:,:) + alpha_new(2,:,:)), [2,1,1] );
         forward_backward_prob = [alpha_new .* [mapDistributionOneCol(row,1,:); 1-mapDistributionOneCol(row,1,:)] ];        
         distribution = forward_backward_prob(1,:,:) ./ (forward_backward_prob(1,:,:) + forward_backward_prob(2,:,:));
@@ -68,7 +71,7 @@ function [oneCol, costMapOneCol] = routine_TopDown(randMap, mapDistributionOneCo
     %       update alpha
         emission = constant * exp( -( 1-costMapOneCol(row,:,:) ).^2/(2*sigma*sigma) );
         alpha = [emission .* (alpha(1,:,:) * transitionProb(1,1) + alpha(2,:,:) * transitionProb(2,1));...
-            emission_uniform .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
+            emission_uniform(row,1,:) .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
         alpha = alpha./ repmat((alpha(1,:,:) + alpha(2,:,:)), [2,1,1] );
         
     end    
