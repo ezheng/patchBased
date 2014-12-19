@@ -3,7 +3,7 @@ function  [bestDepth,costWithBestDepth] = costCalculationGiveId(costMap, meshX, 
     image1_struct, otherImage_struct, data1, mapDistribution)
 
 % propogate distribution:
-numOfSample = 10;
+numOfSample = 6;
 
 idSelected = drawSample( mapDistribution, numOfSample);
 
