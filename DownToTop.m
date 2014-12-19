@@ -1,4 +1,4 @@
-function [ depthMap, costMap] = DownToTop( image1_struct, otherImage_struct, depthMap,mapDistribution,  costMap, halfWindowSize, near, far,sigma,prob,NCCDistribution)
+function [ depthMap, costMap, mapDistribution] = DownToTop( image1_struct, otherImage_struct, depthMap,mapDistribution,  costMap, halfWindowSize, near, far,sigma,prob,NCCDistribution)
 
 h = image1_struct.h;
 w = image1_struct.w;
@@ -12,7 +12,7 @@ parfor col = 1:w
   %  fprintf(1, 'col: %d\n', col);
     mapDistributionOneCol = mapDistribution(:,col,:);
     costMapOneCol = costMap(:,col,:);
-    [emptyMap(:, col), costMap(:,col,:)] = routine_DownTop(randMap, mapDistributionOneCol, costMapOneCol, image1_struct, otherImage_struct, depthMap, col, halfWindowSize,sigma,prob,NCCDistribution);    
+    [emptyMap(:, col), costMap(:,col,:), mapDistribution(:,col,:) ] = routine_DownTop(randMap, mapDistributionOneCol, costMapOneCol, image1_struct, otherImage_struct, depthMap, col, halfWindowSize,sigma,prob,NCCDistribution);    
 end
 fprintf(1, 'elapsed time is %f', toc);
 depthMap = emptyMap;
@@ -23,7 +23,7 @@ end
 %  to update the depth, and then update the forward message. compute the
 %  probability,
 
-function [oneCol, costMapOneCol] = routine_DownTop(randMap, mapDistributionOneCol, costMapOneCol, image1_struct, otherImage_struct, depthMap, col, halfWindowSize,sigma,prob,NCCDistribution)
+function [oneCol, costMapOneCol, mapDistributionOneCol] = routine_DownTop(randMap, mapDistributionOneCol, costMapOneCol, image1_struct, otherImage_struct, depthMap, col, halfWindowSize,sigma,prob,NCCDistribution)
     [h,w,~] = size(image1_struct.imageData);
     numOfSourceImgs = numel(otherImage_struct);
 %     updatedCost = zeros(h, 1, numOfSourceImgs);
@@ -75,9 +75,11 @@ function [oneCol, costMapOneCol] = routine_DownTop(randMap, mapDistributionOneCo
         alpha = [emission .* (alpha(1,:,:) * transitionProb(1,1) + alpha(2,:,:) * transitionProb(2,1));...
               emission_uniform .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
         alpha = alpha./ repmat((alpha(1,:,:) + alpha(2,:,:)), [2,1,1] );
+%       compute and  save the new forward-backward message
+        forward_backward_prob = [alpha .* [mapDistributionOneCol(row,1,:); 1-mapDistributionOneCol(row,1,:)] ];
+        mapDistributionOneCol(row,1,:) = forward_backward_prob(1,:,:) ./ (forward_backward_prob(1,:,:) + forward_backward_prob(2,:,:));
         
     end
     oneCol = depthMap(:,col);
     
 end
-

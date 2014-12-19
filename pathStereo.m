@@ -64,25 +64,25 @@ NCCDistribution = [NCCDistribution(1), NCCDistribution,NCCDistribution(end)];
 for i = 1:numOfIteration
     
     backwardMap = backwardMessage_row_left2rightProp(costMap, sigma, prob,NCCDistribution);
-    [ depthMap, costMap] = proporgation( img1_struct, otherImage_struct, depthMap,backwardMap,costMap, 0, halfWindowSize, near, far,sigma,prob,NCCDistribution);
+    [ depthMap, costMap,distribution] = proporgation( img1_struct, otherImage_struct, depthMap,backwardMap,costMap, 0, halfWindowSize, near, far,sigma,prob,NCCDistribution);
     fprintf(1, 'Iteration %i is finished. Left -> right \n', i);
 %     figure(); imagesc(depthMap); axis equal;
      
  
     backwardMap = backwardMessage_col_top2botProp(costMap, sigma, prob,NCCDistribution);
-    [ depthMap,costMap] = proporgation( img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 2, halfWindowSize, near, far,sigma,prob,NCCDistribution);
+    [ depthMap,costMap,distribution] = proporgation( img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 2, halfWindowSize, near, far,sigma,prob,NCCDistribution);
     fprintf(1, 'Iteration %i is finished. top -> bottom\n', i);
 %     figure(); imagesc(depthMap); axis equal;
 
 
     backwardMap = backwardMessage_row_right2leftProp(costMap, sigma, prob,NCCDistribution);
-    [ depthMap, costMap] = proporgation( img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 1, halfWindowSize, near, far,sigma,prob,NCCDistribution);
+    [ depthMap, costMap,distribution] = proporgation( img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 1, halfWindowSize, near, far,sigma,prob,NCCDistribution);
     fprintf(1, 'Iteration %i is finished. right -> left\n', i);
 %     figure(); imagesc(depthMap); axis equal;
 
 
     backwardMap = backwardMessage_col_bot2topProp(costMap, sigma, prob,NCCDistribution);
-    [ depthMap, costMap] = proporgation( img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 3, halfWindowSize, near, far,sigma,prob,NCCDistribution);
+    [ depthMap, costMap,distribution] = proporgation( img1_struct, otherImage_struct, depthMap, backwardMap,costMap, 3, halfWindowSize, near, far,sigma,prob,NCCDistribution);
     fprintf(1, 'Iteration %i is finished. bottom -> top\n', i);
 %     figure(); imagesc(depthMap); axis equal;
     
