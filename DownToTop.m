@@ -34,16 +34,17 @@ function [oneCol, costMapOneCol] = routine_DownTop(randMap, mapDistributionOneCo
     emission = constant * exp( -( 1-costMapOneCol(w,1,:) ).^2/(2*sigma*sigma) ); %compute the cost of 1st variable
 %     emission_uniform = 0.5;
     numOfBins = numel(NCCDistribution)-2;    
-     emission_uniform = NCCDistribution(floor((1 - costMapOneCol)/ (2/numOfBins))+2);
- 
-    alpha = [emission; emission_uniform(1,:,:) ]; alpha = alpha./repmat((alpha(1,:,:) + alpha(2,:,:)), 2, 1);
+    emission_uniform = NCCDistribution(floor((1 - costMapOneCol(1,1,:))/ (2/numOfBins))+2);
+
+    alpha = [emission; emission_uniform ]; alpha = alpha./repmat((alpha(1,:,:) + alpha(2,:,:)), 2, 1);
 
     for row = h-1 : -1 : 1
 %       compute alpha, and compute probability, and then update depth
 
         emission = constant * exp( -( 1-costMapOneCol(row,1,:) ).^2/(2*sigma*sigma) ); 
+        emission_uniform = NCCDistribution(floor((1 - costMapOneCol(row,1,:))/ (2/numOfBins))+2);
         alpha_new = [emission .* (alpha(1,:,:) * transitionProb(1,1) + alpha(2,:,:) * transitionProb(2,1));...
-            emission_uniform(row,1,:) .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
+            emission_uniform .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
         alpha_new = alpha_new./ repmat((alpha_new(1,:,:) + alpha_new(2,:,:)), [2,1,1] );
         forward_backward_prob = [alpha_new .* [mapDistributionOneCol(row,1,:); 1-mapDistributionOneCol(row,1,:)] ];        
         distribution = forward_backward_prob(1,:,:) ./ (forward_backward_prob(1,:,:) + forward_backward_prob(2,:,:));
@@ -70,8 +71,9 @@ function [oneCol, costMapOneCol] = routine_DownTop(randMap, mapDistributionOneCo
         
   %       update alpha      
         emission = constant * exp( -( 1-costMapOneCol(row,:,:) ).^2/(2*sigma*sigma) );
+        emission_uniform = NCCDistribution(floor((1 - costMapOneCol(row,1,:))/ (2/numOfBins))+2);
         alpha = [emission .* (alpha(1,:,:) * transitionProb(1,1) + alpha(2,:,:) * transitionProb(2,1));...
-              emission_uniform(row,1,:) .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
+              emission_uniform .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
         alpha = alpha./ repmat((alpha(1,:,:) + alpha(2,:,:)), [2,1,1] );
         
     end

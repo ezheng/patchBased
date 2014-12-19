@@ -4,6 +4,8 @@ costMapComputation = zeros( size(depthMap,1), size(depthMap,2), numel(otherImage
 
 tic
 parfor row = 1: size(depthMap,1)
+% for row = 1: size(depthMap,1)
+%     fprintf('row: %d\n', row);
     costMapComputation(row,:,:) = costMapComputation_route(row, depthMap, img1_struct, otherImage_struct, halfWindowSize);
 end
 fprintf(1, 'Cost map computation time: %d seconds\n', toc);

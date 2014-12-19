@@ -34,16 +34,17 @@ function [oneRow,costMapOneRow] = routine_RightLeft(randMap, mapDistributionOneR
     emission = constant * exp( -( 1-costMapOneRow(1,w,:) ).^2/(2*sigma*sigma) ); %compute the cost of the last variable   
 %     emission_uniform = 0.5;
      numOfBins = numel(NCCDistribution)-2;    
-     emission_uniform = NCCDistribution(floor((1 - costMapOneRow)/ (2/numOfBins))+2);
+     emission_uniform = NCCDistribution(floor((1 - costMapOneRow(1,1,:))/ (2/numOfBins))+2);
     
-    alpha = [emission; emission_uniform(:,1,:)]; alpha = alpha./repmat((alpha(1,:,:) + alpha(2,:,:)), 2, 1);
+    alpha = [emission; emission_uniform]; alpha = alpha./repmat((alpha(1,:,:) + alpha(2,:,:)), 2, 1);
     
     for col = w-1 : -1 : 1        
 %       compute alpha, and compute probability, and then update depth
 
-        emission = constant * exp( -( 1-costMapOneRow(:,col,:) ).^2/(2*sigma*sigma) );       
+        emission = constant * exp( -( 1-costMapOneRow(:,col,:) ).^2/(2*sigma*sigma) );   
+        emission_uniform = NCCDistribution(floor((1 - costMapOneRow(1,col,:))/ (2/numOfBins))+2);
         alpha_new = [emission .* (alpha(1,:,:) * transitionProb(1,1) + alpha(2,:,:) * transitionProb(2,1));...
-            emission_uniform(:,col,:) .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
+            emission_uniform .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
         alpha_new = alpha_new./ repmat((alpha_new(1,:,:) + alpha_new(2,:,:)), [2,1,1] );
         forward_backward_prob = [alpha_new .* [mapDistributionOneRow(1,col,:); 1-mapDistributionOneRow(1,col,:)] ];
         distribution = forward_backward_prob(1,:,:) ./ (forward_backward_prob(1,:,:) + forward_backward_prob(2,:,:));
@@ -67,11 +68,12 @@ function [oneRow,costMapOneRow] = routine_RightLeft(randMap, mapDistributionOneR
              distribution );
        costMapOneRow(1,col,:) = reshape(costWithBestDepth, 1,1,numOfSourceImgs);
        depthMap(row, col) = bestDepth;
-        
+                
        %       update alpha
        emission = constant * exp( -( 1-costMapOneRow(:,col,:) ).^2/(2*sigma*sigma) );
+       emission_uniform = NCCDistribution(floor((1 - costMapOneRow(1,col,:))/ (2/numOfBins))+2);
        alpha = [emission .* (alpha(1,:,:) * transitionProb(1,1) + alpha(2,:,:) * transitionProb(2,1));...
-            emission_uniform(:,col,:) .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
+            emission_uniform .* (alpha(1,:,:)*transitionProb(1,2) + alpha(2,:,:) * transitionProb(2,2))];
        alpha = alpha./ repmat((alpha(1,:,:) + alpha(2,:,:)), [2,1,1] );
        
     end

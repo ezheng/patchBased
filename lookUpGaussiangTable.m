@@ -19,7 +19,7 @@ ind(ind == 401) = 400;
 
 prob = table(ind);
 
-
+error('this file should not be executed\n');
 % probLog
 
 

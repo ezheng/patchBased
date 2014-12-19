@@ -21,7 +21,7 @@ color = color(:);   % some pixels may have NaN value. We do not count it in
 % else
 %    color = zeros(3 * size(proj,2),1); 
 % end
-
+color(isnan(color)) = 0;
 
 % n =  [0,0,1]';
 % R = R2 * R1'; 
